@@ -1,0 +1,59 @@
+import { createBrowserRouter } from "react-router-dom";
+import "./index.css";
+import { Login } from "./pages/login/Login";
+import { Profile } from "./pages/profile/Profile";
+
+export const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <Login/>,
+    },
+    {
+        path: "/profile",
+        element: <Profile/>,
+    },
+    {
+        path: "/user/*",
+        element: <div>user</div>,
+    },
+    {
+        path: "/user/decks/*",
+        element: <div>user decks</div>,
+    },
+    {
+        path: "/user/matches/*",
+        element: <div>user matches</div>,
+    },
+    {
+        path: "/decks",
+        element: <div>my decks</div>,
+    },
+    {
+        path: "/tierlists/meta",
+        element: <div>tierlist meta</div>,
+    },
+    {
+        path: "/tierlists/chill",
+        element: <div>tierlist chill</div>,
+    },
+    {
+        path: "/matches",
+        element: <div>matches</div>,
+    },
+    {
+        path: "/pools",
+        element: <div>pools</div>,
+    },
+    {
+        path: "/search",
+        element: <div>search</div>,
+    },
+    {
+        path: "/deck/*",
+        element: <div>single deck</div>,
+    },
+    {
+        path: "/card/*",
+        element: <div>card</div>,
+    }
+]);
