@@ -15,7 +15,7 @@ export const ImportDeckDialog = () => {
 
     return (
         <>
-            <Button onClick={() => setImportDialogOpen(true)}>Import</Button>
+            <Button onClick={() => setImportDialogOpen(true)}>Importar Deck</Button>
             <Dialog open={importDialogOpen} onClose={() => setImportDialogOpen(false)} PaperProps={{ sx: { padding: 4 } }}>
                 <Typography>Import deck</Typography>
                 <TextField label="deck name" value={deckName} onChange={(e) => setDeckName(e.target.value)} />

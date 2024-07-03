@@ -7,8 +7,9 @@ function App() {
   useCheckSession();
 
   return (
-    <Grid container>
-      <RouterProvider router={router} />
+    <Grid sx={{ width: "100%", height: "100vh" }}>
+      {/* PONER COMPROBACION EN EL LAYOUT PARA REDIRIGIR A LOGIN */}
+        <RouterProvider router={router} />
     </Grid>
   )
 }

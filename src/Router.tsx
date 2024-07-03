@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import "./index.css";
 import { Login } from "./pages/login/Login";
 import { Profile } from "./pages/profile/Profile";
+import { SingleDeck } from "./pages/single-deck/SingleDeck";
 
 export const router = createBrowserRouter([
     {
@@ -15,14 +16,6 @@ export const router = createBrowserRouter([
     {
         path: "/user/*",
         element: <div>user</div>,
-    },
-    {
-        path: "/user/decks/*",
-        element: <div>user decks</div>,
-    },
-    {
-        path: "/user/matches/*",
-        element: <div>user matches</div>,
     },
     {
         path: "/decks",
@@ -50,7 +43,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/deck/*",
-        element: <div>single deck</div>,
+        element: <SingleDeck/>,
     },
     {
         path: "/card/*",
