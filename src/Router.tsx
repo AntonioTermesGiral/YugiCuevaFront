@@ -3,6 +3,7 @@ import "./index.css";
 import { Login } from "./pages/login/Login";
 import { Profile } from "./pages/profile/Profile";
 import { SingleDeck } from "./pages/single-deck/SingleDeck";
+import { SingleCard } from "./pages/single-card/Card";
 
 export const router = createBrowserRouter([
     {
@@ -47,6 +48,6 @@ export const router = createBrowserRouter([
     },
     {
         path: "/card/*",
-        element: <div>card</div>,
+        element: <SingleCard />,
     }
 ]);
