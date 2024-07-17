@@ -86,7 +86,6 @@ export const SingleDeck = () => {
             <img height={156.4} width={107.2} src={card.cardImage} />
         </Grid>;
 
-    // https://images.ygoprodeck.com/images/assets/ygoprodeck_header_logo.png?v=1.13
     // 2 views? 1 with all card and the other with each card and its qty
     /* TODO: OPTIONS TO CHANGE VTYPE */
     return <Grid container direction="column" px={2} mt={2}>
