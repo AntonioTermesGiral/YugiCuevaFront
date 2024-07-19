@@ -8,7 +8,7 @@ function App() {
 
   return (
     <Grid sx={{ width: "100%", height: "100vh" }}>
-      {/* PONER COMPROBACION EN EL LAYOUT PARA REDIRIGIR A LOGIN */}
+      {/* TODO: ADD CHECK ON LAYOUT TO REDIRECT TO LOGIN ON UNLOGGED */}
         <RouterProvider router={router} />
     </Grid>
   )

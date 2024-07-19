@@ -15,7 +15,7 @@ export const DeckCard = ({ deck, hideTierInfo }: IDeckCard) => {
             <CardMedia
                 sx={{ height: 150, width: "100%" }}
                 image="/images/card-question.png"
-                title="green iguana"
+                title="deck"
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">

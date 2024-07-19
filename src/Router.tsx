@@ -5,23 +5,24 @@ import { Profile } from "./pages/profile/Profile";
 import { SingleDeck } from "./pages/single-deck/SingleDeck";
 import { SingleCard } from "./pages/single-card/Card";
 import { TierList } from "./pages/tierlist/TierList";
+import { Search } from "./pages/search/Search";
 
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <Login/>,
+        element: <Login />,
     },
     {
         path: "/user/*",
-        element: <Profile/>,
+        element: <Profile />,
     },
     {
         path: "/tierlists/meta",
-        element: <TierList variant="META"/>,
+        element: <TierList variant="META" />,
     },
     {
         path: "/tierlists/chill",
-        element: <TierList variant="CHILL"/>,
+        element: <TierList variant="CHILL" />,
     },
     { // P2
         path: "/matches",
@@ -31,13 +32,13 @@ export const router = createBrowserRouter([
         path: "/pools",
         element: <div>pools</div>,
     },
-    { // P1
-        path: "/search",
-        element: <div>search</div>,
+    {
+        path: "/search/*",
+        element: <Search />,
     },
     {
         path: "/deck/*",
-        element: <SingleDeck/>,
+        element: <SingleDeck />,
     },
     {
         path: "/card/*",

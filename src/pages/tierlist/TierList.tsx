@@ -1,8 +1,9 @@
-import { Card, Grid, Paper, Typography } from "@mui/material";
+import { Grid, Paper, Typography } from "@mui/material";
 import { Enums, Tables } from "../../database.types"
 import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
 import { DeckCard } from "../../components/DeckCard";
+import { maxTier } from "../../constants/tiers";
 
 interface ITierList {
     variant: Enums<"Tierlist">;
@@ -39,8 +40,7 @@ export const TierList = ({ variant }: ITierList) => {
 
         // Get unused tiers
         // TODO: make configurable
-        const lastTier = 5;
-        for (let i = 0; i <= lastTier; i++) {
+        for (let i = 0; i <= maxTier; i++) {
             if (!decksBSorted.get(i)) {
                 decksBSorted.set(i, []);
             }
