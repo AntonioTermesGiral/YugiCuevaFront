@@ -1,9 +1,10 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Grid, Tab, Tabs, Typography } from "@mui/material"
+import { Grid, Tab, Tabs, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useClient } from "../../client/useClient";
 import { ImportDeckDialog } from "./import_dialog/ImportDeckDialog";
 import { Tables } from "../../database.types";
 import { useNavigate } from "react-router-dom";
+import { DeckCard } from "../../components/DeckCard";
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
@@ -19,6 +20,7 @@ export const Profile = () => {
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
     const [matches, setMatches] = useState<Tables<'match'>[]>([]);
     const [selectedTab, setSelectedTab] = useState<TABS>("DECKS");
+    const [isCurrentUser, setIsCurrentUser] = useState(false);
 
 
     const getUserData = async (): Promise<IProfileResponse | undefined> => {
@@ -26,8 +28,11 @@ export const Profile = () => {
         const supastorage = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
         if (supastorage) {
             const supabase = getInstance();
+            const url = new URL(location.href);
+            setIsCurrentUser(JSON.parse(supastorage).user.id ===  url.searchParams.get("id"));
+
             // Get user
-            let { data: profile, error } = await supabase.from('profile').select().eq('id', JSON.parse(supastorage).user.id);
+            let { data: profile, error } = await supabase.from('profile').select().eq('id', url.searchParams.get("id"));
             console.log(error, profile);
 
             // Get decks
@@ -53,7 +58,7 @@ export const Profile = () => {
             <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: "lightgray", py: 4, px: 2 }}>
                 <Grid item xs={12} md={3} lg={2} display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
                     {/* TODO: Get image from bucket */}
-                    <img width="200" height="200" src="./images/default-profile.jpg" style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
+                    <img width="200" height="200" src="/images/default-profile.jpg" style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >
@@ -70,36 +75,11 @@ export const Profile = () => {
             <Grid item container px={2} pt={2}>
                 {selectedTab == "DECKS" ?
                     <Grid container>
-                        <ImportDeckDialog />
+                        {isCurrentUser && <ImportDeckDialog />}
                         <Grid container mt={2} spacing={4}>
                             {decks.map((deck) => (
                                 <Grid display="flex" justifyContent="center" key={deck.id} item xs={12} sm={4} md={3} lg={2} mb={2}>
-                                    <Card key={deck.id} sx={{ maxWidth: 250, width: "100%" }}>
-                                        <CardMedia
-                                            sx={{ height: 150, width: "100%" }}
-                                            image="/images/card-question.png"
-                                            title="green iguana"
-                                        />
-                                        <CardContent>
-                                            <Typography gutterBottom variant="h5" component="div">
-                                                {deck.name}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Deck Stats (Tierlist)
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                (Tier)
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                (Points)
-                                            </Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Button size="small" onClick={() => {
-                                                navigate("/deck/?id=" + deck.id)
-                                            }}>Deck details →</Button>
-                                        </CardActions>
-                                    </Card>
+                                    <DeckCard deck={deck}/>
                                 </Grid>
                             ))}
                         </Grid>

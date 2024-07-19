@@ -29,7 +29,7 @@ export const SingleDeck = () => {
     const [content, setContent] = useState<IDeckContent[]>([]);
     const [authorName, setAuthorName] = useState<String>();
 
-    // Set by preferences???
+    // TODO: Set by preferences???
     const [viewType, setViewType] = useState<DECK_VIEW_TYPE>("NORMAL");
 
     const loadDeckData = async (): Promise<IDeckScreenData | undefined> => {

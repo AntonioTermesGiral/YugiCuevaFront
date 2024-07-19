@@ -24,10 +24,7 @@ export const Login = () => {
         });
 
         console.log(user, userErr);
-
-        let { data, error } = await supabase.from('card').select();
-        console.log(error);
-        return data;
+        return user;
     }
 
     return (
@@ -46,7 +43,7 @@ export const Login = () => {
                     </Grid>
                     <Grid item>
                         <Button onClick={() => {
-                            handleLogin().then(() => navigate("/profile"));
+                            handleLogin().then((res) => navigate("/user/?id=" + res.user?.id ));
                         }}>
                             Submit
                         </Button>

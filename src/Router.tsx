@@ -4,6 +4,7 @@ import { Login } from "./pages/login/Login";
 import { Profile } from "./pages/profile/Profile";
 import { SingleDeck } from "./pages/single-deck/SingleDeck";
 import { SingleCard } from "./pages/single-card/Card";
+import { TierList } from "./pages/tierlist/TierList";
 
 export const router = createBrowserRouter([
     {
@@ -11,34 +12,26 @@ export const router = createBrowserRouter([
         element: <Login/>,
     },
     {
-        path: "/profile",
+        path: "/user/*",
         element: <Profile/>,
     },
     {
-        path: "/user/*",
-        element: <div>user</div>,
-    },
-    {
-        path: "/decks",
-        element: <div>my decks</div>,
-    },
-    {
         path: "/tierlists/meta",
-        element: <div>tierlist meta</div>,
+        element: <TierList variant="META"/>,
     },
     {
         path: "/tierlists/chill",
-        element: <div>tierlist chill</div>,
+        element: <TierList variant="CHILL"/>,
     },
-    {
+    { // P2
         path: "/matches",
         element: <div>matches</div>,
     },
-    {
+    { // P3
         path: "/pools",
         element: <div>pools</div>,
     },
-    {
+    { // P1
         path: "/search",
         element: <div>search</div>,
     },
