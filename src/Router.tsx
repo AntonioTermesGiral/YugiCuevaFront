@@ -6,6 +6,7 @@ import { SingleDeck } from "./pages/single-deck/SingleDeck";
 import { SingleCard } from "./pages/single-card/Card";
 import { TierList } from "./pages/tierlist/TierList";
 import { Search } from "./pages/search/Search";
+import { Matches } from "./pages/matches/Matches";
 
 export const router = createBrowserRouter([
     {
@@ -24,11 +25,11 @@ export const router = createBrowserRouter([
         path: "/tierlists/chill",
         element: <TierList variant="CHILL" />,
     },
-    { // P2
+    {
         path: "/matches",
-        element: <div>matches</div>,
+        element: <Matches />,
     },
-    { // P3
+    { // TODO: To be implemented
         path: "/pools",
         element: <div>pools</div>,
     },
