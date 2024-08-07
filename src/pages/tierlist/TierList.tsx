@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
 import { DeckCard } from "../../components/DeckCard";
 import { maxTier } from "../../constants/tiers";
+import { useLocation } from "react-router-dom";
 
 interface ITierList {
     variant: Enums<"Tierlist">;
@@ -11,6 +12,7 @@ interface ITierList {
 
 export const TierList = ({ variant }: ITierList) => {
     const { getInstance } = useClient();
+    const loc = useLocation();
     const [sortedDecks, setSortedDecks] = useState<Map<number, Tables<"deck">[]>>(new Map());
 
     const getTierListData = async () => {
@@ -54,11 +56,10 @@ export const TierList = ({ variant }: ITierList) => {
 
     useEffect(() => {
         getTierListData().then(setSortedDecks);
-    }, []);
+    }, [loc.pathname]);
 
     useEffect(() => {
         console.log([...sortedDecks]);
-
     }, [sortedDecks]);
 
     return (
@@ -76,7 +77,7 @@ export const TierList = ({ variant }: ITierList) => {
                             <Grid item container alignItems="center" xs={10}>
                                 {currentTierDecks.map((currentDeck) => (
                                     <Grid item key={currentDeck.id} m={1} minWidth="200px">
-                                        <DeckCard deck={currentDeck} hideTierInfo/>
+                                        <DeckCard deck={currentDeck} hideTierInfo />
                                     </Grid>
                                 ))}
                                 {currentTierDecks.length == 0 && <Typography variant="h5" ml={1}>No Decks...</Typography>}

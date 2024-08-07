@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouteObject } from "react-router-dom";
 import "./index.css";
 import { Login } from "./pages/login/Login";
 import { Profile } from "./pages/profile/Profile";
@@ -7,15 +7,18 @@ import { SingleCard } from "./pages/single-card/Card";
 import { TierList } from "./pages/tierlist/TierList";
 import { Search } from "./pages/search/Search";
 import { Matches } from "./pages/matches/Matches";
+import { YGCToolbar } from "./components/layout/Toolbar";
+import { WipScreen } from "./components/WipScreen";
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
     {
         path: "/",
         element: <Login />,
+        id: "login"
     },
     {
         path: "/user/*",
-        element: <Profile />,
+        element: <Profile />
     },
     {
         path: "/tierlists/meta",
@@ -30,8 +33,8 @@ export const router = createBrowserRouter([
         element: <Matches />,
     },
     { // TODO: To be implemented
-        path: "/pools",
-        element: <div>pools</div>,
+        path: "/polls",
+        element: <div>Polls<WipScreen/></div>,
     },
     {
         path: "/search/*",
@@ -45,4 +48,13 @@ export const router = createBrowserRouter([
         path: "/card/*",
         element: <SingleCard />,
     }
-]);
+];
+
+const addWrapper = (route: RouteObject) => {
+    if (route.id != "login") {
+        route.element = <YGCToolbar>{route.element as JSX.Element}</YGCToolbar>;
+    }
+    return route;
+}
+
+export const router = createBrowserRouter(routes.map(addWrapper));

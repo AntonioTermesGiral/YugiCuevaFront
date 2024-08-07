@@ -3,11 +3,12 @@ import { useEffect, useState } from "react"
 import { Tables } from "../../database.types"
 import { useClient } from "../../client/useClient"
 import { DeckCard } from "../../components/DeckCard"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export const FilledSearch = () => {
     const { getInstance } = useClient();
     const navigate = useNavigate();
+    const loc = useLocation();
     const [foundDecks, setFoundDecks] = useState<Tables<"deck">[]>([]);
     const [foundUsers, setFoundUsers] = useState<Tables<"profile">[]>([]);
 
@@ -43,7 +44,7 @@ export const FilledSearch = () => {
             setFoundDecks(decks);
             setFoundUsers(users);
         });
-    }, [])
+    }, [loc.pathname])
 
     return (
         <Grid container direction="column" p={2}>

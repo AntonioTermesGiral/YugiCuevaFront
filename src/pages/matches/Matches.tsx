@@ -3,6 +3,7 @@ import { useClient } from "../../client/useClient";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
+import { WipScreen } from "../../components/WipScreen";
 
 interface IPlayerData {
     playerId: string | null,
@@ -165,6 +166,7 @@ export const Matches = () => {
                     )
                 })}
             </Grid>
+            <WipScreen/>
         </Grid>
     )
 }

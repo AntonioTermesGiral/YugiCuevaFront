@@ -3,8 +3,9 @@ import { useEffect, useState } from "react"
 import { useClient } from "../../client/useClient";
 import { ImportDeckDialog } from "./import_dialog/ImportDeckDialog";
 import { Tables } from "../../database.types";
-import { useNavigate } from "react-router-dom";
 import { DeckCard } from "../../components/DeckCard";
+import { useLocation } from "react-router-dom";
+import { WipScreen } from "../../components/WipScreen";
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
@@ -15,7 +16,7 @@ export const Profile = () => {
 
     type TABS = "DECKS" | "MATCHES";
     const { getInstance } = useClient();
-    const navigate = useNavigate();
+    const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
     const [matches, setMatches] = useState<Tables<'match'>[]>([]);
@@ -29,7 +30,7 @@ export const Profile = () => {
         if (supastorage) {
             const supabase = getInstance();
             const url = new URL(location.href);
-            setIsCurrentUser(JSON.parse(supastorage).user.id ===  url.searchParams.get("id"));
+            setIsCurrentUser(JSON.parse(supastorage).user.id === url.searchParams.get("id"));
 
             // Get user
             let { data: profile, error } = await supabase.from('profile').select().eq('id', url.searchParams.get("id"));
@@ -51,7 +52,7 @@ export const Profile = () => {
             setUser(res?.profile);
             setDecks(res?.decks ?? []);
         })
-    }, [])
+    }, [loc.search])
 
     return (
         <Grid container direction='column' sx={{ alignItems: "center" }}>
@@ -79,12 +80,16 @@ export const Profile = () => {
                         <Grid container mt={2} spacing={4}>
                             {decks.map((deck) => (
                                 <Grid display="flex" justifyContent="center" key={deck.id} item xs={12} sm={4} md={3} lg={2} mb={2}>
-                                    <DeckCard deck={deck}/>
+                                    <DeckCard deck={deck} />
                                 </Grid>
                             ))}
                         </Grid>
                     </Grid>
-                    : <Typography>MATCHES</Typography>
+                    :
+                    <Grid>
+                        <Typography>MATCHES</Typography>
+                        <WipScreen />
+                    </Grid>
                 }
             </Grid>
         </Grid >

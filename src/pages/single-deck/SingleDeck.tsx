@@ -14,7 +14,12 @@ interface IDeckContent {
 interface IDeckScreenData {
     deckContents: IDeckContent[];
     deckData: Tables<'deck'>;
+    authorData: IDeckAuthorData;
+}
+
+interface IDeckAuthorData {
     authorDisplayName: String;
+    authorId: String;
 }
 
 type DECK_VIEW_TYPE = "NORMAL" | "COMPACT";
@@ -27,7 +32,7 @@ export const SingleDeck = () => {
 
     const [deckData, setDeckData] = useState<Tables<'deck'>>();
     const [content, setContent] = useState<IDeckContent[]>([]);
-    const [authorName, setAuthorName] = useState<String>();
+    const [authorData, setAuthorData] = useState<IDeckAuthorData>();
 
     // TODO: Set by preferences???
     const [viewType, setViewType] = useState<DECK_VIEW_TYPE>("NORMAL");
@@ -48,7 +53,7 @@ export const SingleDeck = () => {
             linksError && console.error(linksError);
 
             // Author search by id
-            const { data: authorDN, error: authorError } = await supabase.from('profile').select('display_name').eq("id", deckData[0].owner);
+            const { data: authorDN, error: authorError } = await supabase.from('profile').select('id,display_name').eq("id", deckData[0].owner);
             authorError && console.error(authorError);
 
             const dContent = linksData.map((link: Tables<'card_in_deck'>) => {
@@ -60,7 +65,14 @@ export const SingleDeck = () => {
                 } as IDeckContent;
             });
 
-            return { deckData: deckData[0], deckContents: dContent, authorDisplayName: authorDN[0].display_name }
+            return {
+                deckData: deckData[0],
+                deckContents: dContent,
+                authorData: {
+                    authorDisplayName: authorDN[0].display_name,
+                    authorId: authorDN[0].id
+                }
+            }
         }
 
         return undefined;
@@ -71,7 +83,7 @@ export const SingleDeck = () => {
         loadDeckData().then((res) => {
             setContent(res?.deckContents ?? []);
             setDeckData(res?.deckData);
-            setAuthorName(res?.authorDisplayName);
+            setAuthorData(res?.authorData);
         });
     }, []);
 
@@ -90,10 +102,9 @@ export const SingleDeck = () => {
     /* TODO: OPTIONS TO CHANGE VTYPE */
     return <Grid container direction="column" px={2} mt={2}>
         <Grid my={2}>
-            <Typography variant="h2">{deckData?.name ?? "?"}</Typography>
-            {/* TODO: Owner link */}
-            <Typography variant="h5">Deck owner: {authorName ?? "?"}</Typography>
-            <Typography variant="h5">Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
+            <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
+            <Typography variant="h5" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
+            <Typography variant="h5" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
         </Grid>
         <Grid container direction="column" justifyContent="center">
             <Grid sx={cardsContainerStyles}>
