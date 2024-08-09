@@ -18,13 +18,13 @@ export const Login = () => {
         const { getInstance } = useClient();
         const supabase = getInstance();
 
-        const { data: user, error: userErr } = await supabase.auth.signInWithPassword({
-            email: import.meta.env.VITE_TEST_USER_EMAIL,
-            password: import.meta.env.VITE_TEST_USER_PASSWORD,
+        const { data: userData, error: userErr } = await supabase.auth.signInWithPassword({
+            email: user,
+            password: pass
         });
 
-        console.log(user, userErr);
-        return user;
+        console.log(userData, userErr);
+        return userData;
     }
 
     return (

@@ -63,7 +63,7 @@ export const FilledSearch = () => {
                 <Typography variant="h3">Users found: </Typography>
                 <Grid container>
                     {foundUsers.map((currentUser) => (
-                        <Grid item key={currentUser.id} minWidth="250px">
+                        <Grid item m={1} key={currentUser.id} minWidth="250px">
                             <Card>
                                 <CardMedia
                                     sx={{ height: 150, width: "100%" }}

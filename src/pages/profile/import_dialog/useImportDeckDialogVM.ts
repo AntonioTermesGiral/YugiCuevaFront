@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useClient } from "../../../client/useClient";
 import { IYGOPDCard } from "../../../constants/types";
-import { Tables } from "../../../database.types";
+import { Enums, Tables } from "../../../database.types";
 import { parseURL } from "../../../utils/ydke";
 
 export const useImportDeckDialogVM = () => {
@@ -9,8 +9,9 @@ export const useImportDeckDialogVM = () => {
     const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [deckName, setDeckName] = useState("");
     const [ydkeURL, setydkeURL] = useState("");
+    const [deckTierlist, setDeckTierlist] = useState<Enums<"Tierlist">>();
+    const [deckTier, setDeckTier] = useState<number>();
 
-    
     const countCodes = (codes: number[]) => {
         const res = new Map<number, number>;
         codes.forEach((code) => {
@@ -57,6 +58,8 @@ export const useImportDeckDialogVM = () => {
             const { data, error } = await supabase.from('deck').insert({
                 name: deckName,
                 owner: userId,
+                tier: deckTier,
+                tierlist: deckTierlist,
                 points: 0
             } as Tables<'deck'>).select();
 
@@ -155,6 +158,10 @@ export const useImportDeckDialogVM = () => {
         setDeckName,
         ydkeURL,
         setydkeURL,
+        deckTierlist,
+        setDeckTierlist,
+        deckTier,
+        setDeckTier,
         handleUploadDeck
     }
     

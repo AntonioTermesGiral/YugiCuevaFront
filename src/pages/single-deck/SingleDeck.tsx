@@ -87,7 +87,7 @@ export const SingleDeck = () => {
         });
     }, []);
 
-    const Card = ({ card, i }: { card: IDeckContent, i: number }) =>
+    const DeckCard = ({ card, i }: { card: IDeckContent, i: number }) =>
         <Grid {...cardProperties} key={card.cardId + "card" + i}
             onClick={() => navigate("/card/?id=" + card.cardId)}>
             <Grid position="absolute" right="70%" left="30%" bottom="2.5rem">
@@ -95,7 +95,7 @@ export const SingleDeck = () => {
                     x{card.qty}
                 </Typography>
             </Grid>
-            <img height={156.4} width={107.2} src={card.cardImage} />
+            <img height={156.4} width={107.2} src={card.cardImage} style={{backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain"}} />
         </Grid>;
 
     // 2 views? 1 with all card and the other with each card and its qty
@@ -109,17 +109,17 @@ export const SingleDeck = () => {
         <Grid container direction="column" justifyContent="center">
             <Grid sx={cardsContainerStyles}>
                 {content.filter((c) => c.position == "MAIN").map((card, i) => (
-                    <Card card={card} i={i} key={card.cardId + i} />
+                    <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
             </Grid>
             <Grid sx={cardsContainerStyles}>
                 {content.filter((c) => c.position == "EXTRA").map((card, i) => (
-                    <Card card={card} i={i} key={card.cardId + i} />
+                    <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
             </Grid>
             <Grid sx={cardsContainerStyles}>
                 {content.filter((c) => c.position == "SIDE").map((card, i) => (
-                    <Card card={card} i={i} key={card.cardId + i} />
+                    <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
             </Grid>
         </Grid >
