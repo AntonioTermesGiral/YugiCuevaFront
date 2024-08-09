@@ -10,6 +10,7 @@ import { WipScreen } from "../../components/WipScreen";
 interface IProfileResponse {
     profile: Tables<'profile'>;
     decks: Tables<'deck'>[];
+    pfpName: string;
 }
 
 export const Profile = () => {
@@ -19,6 +20,7 @@ export const Profile = () => {
     const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
+    const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
     const [matches, setMatches] = useState<Tables<'match'>[]>([]);
     const [selectedTab, setSelectedTab] = useState<TABS>("DECKS");
     const [isCurrentUser, setIsCurrentUser] = useState(false);
@@ -34,14 +36,17 @@ export const Profile = () => {
 
             // Get user
             let { data: profile, error } = await supabase.from('profile').select().eq('id', url.searchParams.get("id"));
-            console.log(error, profile);
+            error && console.log(error, profile);
 
             // Get decks
             let { data: decks, error: deckError } = await supabase.from('deck').select().eq('owner', profile[0].id);
-            console.log(decks, deckError);
+            deckError && console.log(decks, deckError);
+
+            let { data: pfpName, error: pfpNameError } = await supabase.rpc('get_avatar_by_user_id', { user_id: profile[0].id });
+            pfpNameError && console.log(pfpName, pfpNameError);
 
             // Return
-            return { profile: profile[0], decks: decks };
+            return { profile: profile[0], decks: decks, pfpName: pfpName };
         }
         return undefined;
     }
@@ -51,6 +56,7 @@ export const Profile = () => {
         getUserData().then((res) => {
             setUser(res?.profile);
             setDecks(res?.decks ?? []);
+            res?.pfpName && setPfpUrl(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + res.pfpName);
         })
     }, [loc.search])
 
@@ -59,7 +65,7 @@ export const Profile = () => {
             <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: "lightgray", py: 4, px: 2 }}>
                 <Grid item xs={12} md={3} lg={2} display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
                     {/* TODO: Get image from bucket */}
-                    <img width="200" height="200" src="/images/default-profile.jpg" style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
+                    <img width="200" height="200" src={pfpUrl} style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >

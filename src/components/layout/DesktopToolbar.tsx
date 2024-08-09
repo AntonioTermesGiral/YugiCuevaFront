@@ -1,5 +1,5 @@
 import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid, Menu, MenuItem } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "./Toolbar";
 
@@ -11,6 +11,7 @@ export const YGCDesktopToolbar = () => {
     const tierlistMenuOpen = Boolean(tierlistMenuAnchor);
     const handleOpenTierlistMenu = (event: React.MouseEvent<HTMLElement>) => setTierlistMenuAnchor(event.currentTarget);
     const handleCloseTierlistMenu = () => setTierlistMenuAnchor(null);
+    const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
 
     const handleSearchSubmit = () => {
         if (searchBarValue.trim() != "") {
@@ -18,6 +19,11 @@ export const YGCDesktopToolbar = () => {
             setSearchBarValue("");
         }
     }
+
+    useEffect(() => {
+        const userPFP = localStorage.getItem('current-user-pfp');
+        userPFP && setPfpUrl(userPFP);
+    }, [])
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -28,7 +34,7 @@ export const YGCDesktopToolbar = () => {
                             <img
                                 width="69"
                                 height="69"
-                                src="/images/default-profile.jpg"
+                                src={pfpUrl}
                                 style={{
                                     objectFit: "cover",
                                     borderRadius: "50%",

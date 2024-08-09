@@ -1,13 +1,13 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Grid, Typography } from "@mui/material"
+import { Grid, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Tables } from "../../database.types"
 import { useClient } from "../../client/useClient"
 import { DeckCard } from "../../components/DeckCard"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
+import { UserCard } from "../../components/UserCard"
 
 export const FilledSearch = () => {
     const { getInstance } = useClient();
-    const navigate = useNavigate();
     const loc = useLocation();
     const [foundDecks, setFoundDecks] = useState<Tables<"deck">[]>([]);
     const [foundUsers, setFoundUsers] = useState<Tables<"profile">[]>([]);
@@ -64,23 +64,7 @@ export const FilledSearch = () => {
                 <Grid container>
                     {foundUsers.map((currentUser) => (
                         <Grid item m={1} key={currentUser.id} minWidth="250px">
-                            <Card>
-                                <CardMedia
-                                    sx={{ height: 150, width: "100%" }}
-                                    image="/images/default-profile.jpg"
-                                    title="user"
-                                />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        {currentUser.display_name}
-                                    </Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size="small" onClick={() => {
-                                        navigate("/user/?id=" + currentUser.id)
-                                    }}>User profile →</Button>
-                                </CardActions>
-                            </Card>
+                            <UserCard user={currentUser}/>
                         </Grid>
                     ))}
                 </Grid>

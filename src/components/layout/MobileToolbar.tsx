@@ -1,12 +1,13 @@
 import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, InputBase, Divider, Grid } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "./Toolbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const YGCMobileToolbar = () => {
     const navigate = useNavigate();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [searchBarValue, setSearchBarValue] = useState("");
+    const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
 
     const handleSearchSubmit = () => {
         if (searchBarValue.trim() != "") {
@@ -15,6 +16,11 @@ export const YGCMobileToolbar = () => {
             navigate("/search/?q=" + searchBarValue);
         }
     }
+
+    useEffect(() => {
+        const userPFP = localStorage.getItem('current-user-pfp');
+        userPFP && setPfpUrl(userPFP);
+    }, [])
 
     const handleNavigate = (route: string) => {
         setIsDrawerOpen(false);
@@ -82,7 +88,7 @@ export const YGCMobileToolbar = () => {
                 <img
                     width="50"
                     height="50"
-                    src="/images/default-profile.jpg"
+                    src={pfpUrl}
                     style={{
                         objectFit: "cover",
                         borderRadius: "50%",
