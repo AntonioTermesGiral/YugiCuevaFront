@@ -6,6 +6,7 @@ import { Tables } from "../../database.types";
 import { DeckCard } from "../../components/DeckCard";
 import { useLocation } from "react-router-dom";
 import { WipScreen } from "../../components/WipScreen";
+import { DARK_BLUE } from "../../constants/colors";
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
@@ -62,7 +63,7 @@ export const Profile = () => {
 
     return (
         <Grid container direction='column' sx={{ alignItems: "center" }}>
-            <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: "lightgray", py: 4, px: 2 }}>
+            <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: DARK_BLUE, py: 4, px: 2 }}>
                 <Grid item xs={12} md={3} lg={2} display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
                     {/* TODO: Get image from bucket */}
                     <img width="200" height="200" src={pfpUrl} style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
@@ -72,7 +73,7 @@ export const Profile = () => {
                         <Typography variant="h2" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>{user?.display_name}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={5} display="flex" justifyContent={{ xs: "center", sm: "flex-end" }}>
-                        <Tabs value={selectedTab} onChange={(e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="secondary" indicatorColor="secondary">
+                        <Tabs value={selectedTab} onChange={(e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
                             <Tab label="Decks" value="DECKS" />
                             <Tab label="Matches" value="MATCHES" />
                         </Tabs>

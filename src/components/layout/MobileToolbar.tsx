@@ -2,6 +2,7 @@ import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, Li
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "./Toolbar";
 import { useEffect, useState } from "react";
+import { DARK_BLUE } from "../../constants/colors";
 
 export const YGCMobileToolbar = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ export const YGCMobileToolbar = () => {
 
     return (
         <AppBar position="static">
-            <Toolbar sx={{ backgroundColor: "lightgray", justifyContent: "space-between" }}>
+            <Toolbar sx={{ backgroundColor: DARK_BLUE, justifyContent: "space-between" }}>
                 <IconButton
                     size="large"
                     edge="start"
@@ -40,12 +41,12 @@ export const YGCMobileToolbar = () => {
                 >
                     =
                 </IconButton>
-                <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
+                <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} PaperProps={{ sx: { backgroundColor: DARK_BLUE, color: "white" } }}>
                     <List>
                         <Grid container justifyContent="flex-end" px={2}>
-                            <IconButton onClick={() => setIsDrawerOpen(false)}>{"x"}</IconButton>
+                            <IconButton sx={{ color: "white" }} onClick={() => setIsDrawerOpen(false)}>{"x"}</IconButton>
                         </Grid>
-                        <Divider sx={{ mx: 0.5, my: 2 }} />
+                        <Divider sx={{ mx: 0.5, my: 2, borderColor: "white" }} />
                         <Paper sx={{ m: 1, p: '2px 4px', display: 'flex', alignItems: 'center' }}>
                             <InputBase
                                 sx={{ ml: 1, flex: 1 }}
@@ -55,31 +56,31 @@ export const YGCMobileToolbar = () => {
                                 onChange={(e) => setSearchBarValue(e.target.value)}
                             />
                             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearchSubmit}>
+                            <IconButton type="button" sx={{ p: '10px', color: DARK_BLUE }} aria-label="search" onClick={handleSearchSubmit}>
                                 Q
                             </IconButton>
                         </Paper>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/meta")}>
-                                <ListItemIcon>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
                                 <ListItemText primary="Meta Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/chill")}>
-                                <ListItemIcon>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
                                 <ListItemText primary="Chill Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/matches")}>
-                                <ListItemIcon>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
                                 <ListItemText primary="Matches" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/polls")}>
-                                <ListItemIcon>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
                                 <ListItemText primary="Polls" />
                             </ListItemButton>
                         </ListItem>

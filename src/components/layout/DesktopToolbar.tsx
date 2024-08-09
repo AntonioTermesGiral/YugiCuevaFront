@@ -2,6 +2,7 @@ import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Gr
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "./Toolbar";
+import { DARK_BLUE } from "../../constants/colors";
 
 export const YGCDesktopToolbar = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const YGCDesktopToolbar = () => {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
-                <Toolbar sx={{ backgroundColor: "lightgray", p: 1 }}>
+                <Toolbar sx={{ backgroundColor: DARK_BLUE, p: 1 }}>
                     <Grid container>
                         <Grid item display="flex" alignItems="center" xs={8}>
                             <img
