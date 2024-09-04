@@ -95,7 +95,7 @@ export const SingleDeck = () => {
                     x{card.qty}
                 </Typography>
             </Grid>
-            <img height={156.4} width={107.2} src={card.cardImage} style={{backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain"}} />
+            <img height={156.4} width={107.2} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
         </Grid>;
 
     // 2 views? 1 with all card and the other with each card and its qty

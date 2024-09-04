@@ -4,6 +4,7 @@ import { IYGOPDCard } from "../../../constants/types";
 import { Enums, Tables } from "../../../database.types";
 import { parseURL } from "../../../utils/ydke";
 import Resizer from "react-image-file-resizer";
+import { LS_USER_DATA_KEY } from "../../../constants/keys";
 
 export const useImportDeckDialogVM = () => {
     const { getInstance } = useClient();
@@ -53,7 +54,7 @@ export const useImportDeckDialogVM = () => {
 
     const createDeck = async () => {
 
-        const supastorage = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
+        const supastorage = localStorage.getItem(LS_USER_DATA_KEY);
         if (supastorage) {
             const supabase = getInstance();
             const userId = JSON.parse(supastorage).user.id;
@@ -151,6 +152,9 @@ export const useImportDeckDialogVM = () => {
                                     } else {
                                         alert("The deck image couldn't be uploaded...");
                                     }
+                                })
+                                .finally(() => {
+                                    setImportDialogOpen(false);
                                 })
                             });
                         }

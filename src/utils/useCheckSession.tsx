@@ -1,12 +1,13 @@
 import { useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom";
+import { LS_USER_DATA_KEY } from "../constants/keys";
 
 export const useCheckSession = () => {
     const navigate = useNavigate();
     const loc = useLocation();
 
     useEffect(() => {
-        const userDataText = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
+        const userDataText = localStorage.getItem(LS_USER_DATA_KEY);
 
         if (userDataText) {
             const userData = JSON.parse(userDataText);
@@ -26,7 +27,7 @@ export const useCheckNoSession = () => {
     const loc = useLocation();
 
     useEffect(() => {
-        const userDataText = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
+        const userDataText = localStorage.getItem(LS_USER_DATA_KEY);
 
         if (userDataText) {
             const userData = JSON.parse(userDataText);

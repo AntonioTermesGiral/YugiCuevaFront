@@ -2,7 +2,6 @@ import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@
 import { Tables } from "../database.types"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { useClient } from "../client/useClient"
 
 interface IUserCard {
     user: Tables<"profile">
@@ -10,22 +9,10 @@ interface IUserCard {
 
 export const UserCard = ({ user }: IUserCard) => {
     const navigate = useNavigate();
-    const { getInstance } = useClient();
     const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
 
-    const loadPfp = async () => {
-        const supabase = getInstance();
-
-        let { data: pfpName, error: pfpNameError } = await supabase.rpc('get_avatar_by_user_id', { user_id: user.id });
-        pfpNameError && console.log(pfpName, pfpNameError);
-
-        return pfpName;
-    }
-
     useEffect(() => {
-        loadPfp().then((res) => {
-            res && setPfpUrl(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + res);
-        });
+        setPfpUrl(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + user.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT);
     }, [user])
 
     return (

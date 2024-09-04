@@ -1,25 +1,16 @@
 import { useEffect } from "react"
-import { useClient } from "../client/useClient";
+import { LS_USER_DATA_KEY } from "../constants/keys";
 
 export const useLoadPFP = () => {
-    const { getInstance } = useClient();
-
-    const getUserAvatarById = async (id: string) => {
-        const supabase = getInstance();
-        let { data: pfpName, error: pfpNameError } = await supabase.rpc('get_avatar_by_user_id', { user_id: id });
-        pfpNameError && console.log(pfpName, pfpNameError);
-        return pfpName;
-    }
 
     useEffect(() => {
-        const userDataText = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
+        const userDataText = localStorage.getItem(LS_USER_DATA_KEY);
 
         if (!localStorage.getItem('current-user-pfp') && userDataText) {
             const userData = JSON.parse(userDataText);
             if (userData.expires_at && userData.user.id && userData.expires_at > Math.round(Date.now() / 1000)) {
-                getUserAvatarById(userData.user.id).then((res) => {
-                    localStorage.setItem("current-user-pfp", res ? import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + res : "/images/default-profile.jpg");
-                })
+                const pfpURL = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + userData.user.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT;
+                localStorage.setItem("current-user-pfp", pfpURL);
             } else localStorage.removeItem("current-user-pfp");
         }
     }, []);

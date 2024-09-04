@@ -7,11 +7,12 @@ import { DeckCard } from "../../components/DeckCard";
 import { useLocation } from "react-router-dom";
 import { WipScreen } from "../../components/WipScreen";
 import { DARK_BLUE } from "../../constants/colors";
+import { EditProfileDialog } from "./edit_dialog/EditProfileDialog";
+import { LS_USER_DATA_KEY } from "../../constants/keys";
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
     decks: Tables<'deck'>[];
-    pfpName: string;
 }
 
 export const Profile = () => {
@@ -21,7 +22,6 @@ export const Profile = () => {
     const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
-    const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
     const [matches, setMatches] = useState<Tables<'match'>[]>([]);
     const [selectedTab, setSelectedTab] = useState<TABS>("DECKS");
     const [isCurrentUser, setIsCurrentUser] = useState(false);
@@ -29,25 +29,22 @@ export const Profile = () => {
 
     const getUserData = async (): Promise<IProfileResponse | undefined> => {
 
-        const supastorage = localStorage.getItem('sb-tbdesplqufizydsciqzq-auth-token');
+        const supastorage = localStorage.getItem(LS_USER_DATA_KEY);
         if (supastorage) {
             const supabase = getInstance();
             const url = new URL(location.href);
             setIsCurrentUser(JSON.parse(supastorage).user.id === url.searchParams.get("id"));
 
             // Get user
-            let { data: profile, error } = await supabase.from('profile').select().eq('id', url.searchParams.get("id"));
+            const { data: profile, error } = await supabase.from('profile').select().eq('id', url.searchParams.get("id"));
             error && console.log(error, profile);
 
             // Get decks
-            let { data: decks, error: deckError } = await supabase.from('deck').select().eq('owner', profile[0].id);
+            const { data: decks, error: deckError } = await supabase.from('deck').select().eq('owner', profile[0].id);
             deckError && console.log(decks, deckError);
 
-            let { data: pfpName, error: pfpNameError } = await supabase.rpc('get_avatar_by_user_id', { user_id: profile[0].id });
-            pfpNameError && console.log(pfpName, pfpNameError);
-
             // Return
-            return { profile: profile[0], decks: decks, pfpName: pfpName };
+            return { profile: profile[0], decks: decks };
         }
         return undefined;
     }
@@ -57,7 +54,6 @@ export const Profile = () => {
         getUserData().then((res) => {
             setUser(res?.profile);
             setDecks(res?.decks ?? []);
-            res?.pfpName && setPfpUrl(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + res.pfpName);
         })
     }, [loc.search])
 
@@ -65,8 +61,16 @@ export const Profile = () => {
         <Grid container direction='column' sx={{ alignItems: "center" }}>
             <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: DARK_BLUE, py: 4, px: 2 }}>
                 <Grid item xs={12} md={3} lg={2} display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
-                    {/* TODO: Get image from bucket */}
-                    <img width="200" height="200" src={pfpUrl} style={{ objectFit: "cover", borderRadius: "50%", border: "solid 5px black" }} />
+                    <img width="200" height="200" src={import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + user?.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT}
+                        style={{
+                            backgroundImage: 'url("/images/default-profile.jpg")',
+                            backgroundSize: "cover",
+                            objectFit: "cover",
+                            borderRadius: "50%",
+                            border: "solid 5px black"
+                        }}
+                    />
+                    {isCurrentUser && <EditProfileDialog />}
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >

@@ -88,7 +88,7 @@ export const ImportDeckDialog = () => {
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button onClick={handleUploadDeck}>Yes</Button>
+                        <Button onClick={handleUploadDeck}>Create</Button>
                     </Grid>
                 </Grid>
             </Dialog>

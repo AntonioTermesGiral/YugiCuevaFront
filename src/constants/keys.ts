@@ -1,0 +1,1 @@
+export const LS_USER_DATA_KEY = "sb-tbdesplqufizydsciqzq-auth-token";

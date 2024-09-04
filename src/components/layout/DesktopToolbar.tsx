@@ -37,6 +37,8 @@ export const YGCDesktopToolbar = () => {
                                 height="69"
                                 src={pfpUrl}
                                 style={{
+                                    backgroundImage: 'url("/images/default-profile.jpg")',
+                                    backgroundSize: "cover",
                                     objectFit: "cover",
                                     borderRadius: "50%",
                                     border: "solid 2px black",
