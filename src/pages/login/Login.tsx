@@ -1,10 +1,13 @@
 import { Button, Grid, SxProps, TextField, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useClient } from "../../client/useClient";
-import { useState } from "react";
+import { KeyboardEvent, useState } from "react";
+import { useCheckNoSession } from "../../utils/useCheckSession";
 
 export const Login = () => {
     const navigate = useNavigate();
+    const { getInstance } = useClient();
+    useCheckNoSession();
 
     const theme = useTheme();
     const { loginContainer, loginCard, sideImage } = loginStyles();
@@ -15,8 +18,8 @@ export const Login = () => {
 
     // TODO: login w/username
     const handleLogin = async () => {
-        const { getInstance } = useClient();
         const supabase = getInstance();
+        localStorage.clear();
 
         const { data: userData, error: userErr } = await supabase.auth.signInWithPassword({
             email: user,
@@ -27,11 +30,17 @@ export const Login = () => {
         return userData;
     }
 
+    const handleEnter = (ev: KeyboardEvent) => {
+        if (ev.key == "Enter") {
+            handleLogin().then((res) => navigate("/user/?id=" + res.user?.id));
+        }
+    }
+
     return (
         <Grid container sx={{ ...loginContainer, justifyContent: showImage ? "space-between" : "center" }}>
             {showImage && <Grid item md={6} sx={sideImage} />}
             <Grid item container md={6} sx={{ justifyContent: "center" }}>
-                <Grid item sx={loginCard} rowSpacing={2}>
+                <Grid item sx={loginCard} rowSpacing={2} onKeyDown={handleEnter}>
                     <Grid item>
                         <Typography variant="h4">Login</Typography>
                     </Grid>
@@ -41,13 +50,11 @@ export const Login = () => {
                     <Grid item marginBottom="1rem">
                         <TextField variant="standard" type="password" label="Contraseña" value={pass} onChange={(e) => { setPass(e.target.value) }} />
                     </Grid>
-                    <Grid item>
-                        <Button onClick={() => {
-                            handleLogin().then((res) => navigate("/user/?id=" + res.user?.id ));
-                        }}>
-                            Submit
-                        </Button>
-                    </Grid>
+                    <Button onClick={() => {
+                        handleLogin().then((res) => navigate("/user/?id=" + res.user?.id));
+                    }}>
+                        Submit
+                    </Button>
                 </Grid>
             </Grid>
         </Grid >

@@ -5,9 +5,9 @@ import { useLoadPFP } from "../../utils/useLoadPFP";
 import { useCheckSession } from "../../utils/useCheckSession";
 
 export const getUserRoute = () => {
-    let lsRes = localStorage.getItem("sb-tbdesplqufizydsciqzq-auth-token");
+    const lsRes = localStorage.getItem("sb-tbdesplqufizydsciqzq-auth-token");
     if (lsRes) {
-        let userId = JSON.parse(lsRes).user.id;
+        const userId = JSON.parse(lsRes).user.id;
         return "/user/?id=" + userId;
     }
 

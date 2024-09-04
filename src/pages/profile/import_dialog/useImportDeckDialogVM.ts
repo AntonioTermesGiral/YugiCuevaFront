@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useClient } from "../../../client/useClient";
 import { IYGOPDCard } from "../../../constants/types";
 import { Enums, Tables } from "../../../database.types";
 import { parseURL } from "../../../utils/ydke";
+import Resizer from "react-image-file-resizer";
 
 export const useImportDeckDialogVM = () => {
     const { getInstance } = useClient();
@@ -11,6 +12,7 @@ export const useImportDeckDialogVM = () => {
     const [ydkeURL, setydkeURL] = useState("");
     const [deckTierlist, setDeckTierlist] = useState<Enums<"Tierlist">>();
     const [deckTier, setDeckTier] = useState<number>();
+    const [deckImage, setDeckImage] = useState<File>();
 
     const countCodes = (codes: number[]) => {
         const res = new Map<number, number>;
@@ -24,10 +26,10 @@ export const useImportDeckDialogVM = () => {
 
     const importCards = async (cardList: number[]): Promise<IYGOPDCard[]> => {
         if (cardList.length > 0) {
-            let mainRequestString = cardList.join(",");
+            const mainRequestString = cardList.join(",");
             console.log(mainRequestString);
 
-            let res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?id=' + mainRequestString).then(res => res.text());
+            const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?id=' + mainRequestString).then(res => res.text());
             return JSON.parse(res).data;
         }
 
@@ -142,13 +144,69 @@ export const useImportDeckDialogVM = () => {
                             })
 
                             console.log(cardLinks);
-                            linkCards(cardLinks).then(() => console.log("Import complete"));
+                            linkCards(cardLinks).then(() => {
+                                handleUploadDeckImage(createdDeck.id).then((success) => {
+                                    if (success) {
+                                        console.log("Import complete")
+                                    } else {
+                                        alert("The deck image couldn't be uploaded...");
+                                    }
+                                })
+                            });
                         }
                     })
                 });
             });
         })
 
+    }
+
+    const handleUploadDeckImage = async (deckId: string) => {
+        if (deckImage) {
+            const supabase = getInstance();
+            const { data: uploadData, error: uploadError } = await supabase.storage.from('DeckImages')
+                .upload(`${deckId}.jpeg`, deckImage, { cacheControl: '3600', upsert: false });
+
+            console.log("File uploaded: ", uploadData);
+            console.log("File uploaded id: ", uploadData?.id);
+            uploadError && console.log("File upload error: ", uploadError);
+            return !uploadError;
+        }
+
+        return false;
+    }
+
+    const handleResizeDeckImage = (file: File): Promise<File> =>
+        new Promise((resolve) => {
+            Resizer.imageFileResizer(
+                file,
+                300,
+                300,
+                "JPEG",
+                100,
+                0,
+                (uri) => resolve(uri as File),
+                "file"
+            );
+        });
+
+    const onChangeDeckImage = (ev: ChangeEvent<HTMLInputElement>) => {
+        const files = ev.target.files;
+        const imagePreview = document.getElementById('deck-image-preview') as HTMLImageElement;
+
+        if (files && files[0]) {
+            console.log(files[0])
+            handleResizeDeckImage(files[0]).then((res) => {
+                imagePreview.src = URL.createObjectURL(res)
+                setDeckImage(res);
+            }).catch(() => {
+                imagePreview.removeAttribute("src");
+                setDeckImage(undefined);
+            })
+        } else {
+            imagePreview.removeAttribute("src");
+            setDeckImage(undefined);
+        }
     }
 
     return {
@@ -162,7 +220,8 @@ export const useImportDeckDialogVM = () => {
         setDeckTierlist,
         deckTier,
         setDeckTier,
-        handleUploadDeck
+        handleUploadDeck,
+        onChangeDeckImage
     }
-    
+
 }

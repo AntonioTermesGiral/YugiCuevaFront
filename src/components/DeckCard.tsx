@@ -1,6 +1,8 @@
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@mui/material"
 import { Tables } from "../database.types"
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useClient } from "../client/useClient";
 
 interface IDeckCard {
     deck: Tables<"deck">;
@@ -9,12 +11,35 @@ interface IDeckCard {
 
 export const DeckCard = ({ deck, hideTierInfo }: IDeckCard) => {
     const navigate = useNavigate();
+    const { getInstance } = useClient();
+    const supabase = getInstance();
+    const [hasImage, setHasImage] = useState(false);
+
+    const handleSearchImage = async () => {
+        const { data, error } = await supabase
+            .storage
+            .from('DeckImages')
+            .list('', {
+                limit: 1,
+                offset: 0,
+                search: deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT
+            });
+
+        setHasImage(!error && data.length > 0);
+    }
+
+    useEffect(() => {
+        handleSearchImage();
+    }, []);
 
     return (
         <Card key={deck.id} sx={{ maxWidth: 250, width: "100%" }}>
             <CardMedia
                 sx={{ height: 150, width: "100%" }}
-                image="/images/card-question.png"
+                image={hasImage ?
+                    import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT
+                    : "/images/card-question.png"
+                }
                 title="deck"
             />
             <CardContent>

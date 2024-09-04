@@ -1,7 +1,7 @@
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { Database } from "../database.types";
 
-var clientInstance: SupabaseClient<Database> | null = null;
+let clientInstance: SupabaseClient<Database> | null = null;
 
 export const useClient = () => {
 
