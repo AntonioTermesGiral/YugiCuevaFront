@@ -1,7 +1,7 @@
 import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid, Menu, MenuItem } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRoute } from "./Toolbar";
+import { getUserRoute } from "../utils/getUserRoute";
 import { DARK_BLUE } from "../../constants/colors";
 
 export const YGCDesktopToolbar = () => {

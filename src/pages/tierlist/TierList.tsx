@@ -19,7 +19,7 @@ export const TierList = ({ variant }: ITierList) => {
         const supabase = getInstance();
 
         // Get user
-        let { data: decksData, error } = await supabase.from('deck').select().eq("tierlist", variant);
+        const { data: decksData, error } = await supabase.from('deck').select().eq("tierlist", variant);
         error && console.log(error);
 
         // Assign each deck to its corresponding tier

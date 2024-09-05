@@ -18,11 +18,11 @@ interface IDeckScreenData {
 }
 
 interface IDeckAuthorData {
-    authorDisplayName: String;
-    authorId: String;
+    authorDisplayName: string;
+    authorId: string;
 }
 
-type DECK_VIEW_TYPE = "NORMAL" | "COMPACT";
+//type DECK_VIEW_TYPE = "NORMAL" | "COMPACT";
 
 export const SingleDeck = () => {
 
@@ -35,7 +35,7 @@ export const SingleDeck = () => {
     const [authorData, setAuthorData] = useState<IDeckAuthorData>();
 
     // TODO: Set by preferences???
-    const [viewType, setViewType] = useState<DECK_VIEW_TYPE>("NORMAL");
+    //const [viewType, setViewType] = useState<DECK_VIEW_TYPE>("NORMAL");
 
     const loadDeckData = async (): Promise<IDeckScreenData | undefined> => {
         const url = new URL(location.href);

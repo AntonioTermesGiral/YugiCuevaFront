@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, InputBase, Divider, Grid } from "@mui/material"
 import { useNavigate } from "react-router-dom";
-import { getUserRoute } from "./Toolbar";
+import { getUserRoute } from "../utils/getUserRoute";
 import { useEffect, useState } from "react";
 import { DARK_BLUE } from "../../constants/colors";
 

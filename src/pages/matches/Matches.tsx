@@ -1,6 +1,5 @@
 import { Card, Grid, Typography } from "@mui/material"
 import { useClient } from "../../client/useClient";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
 import { WipScreen } from "../../components/WipScreen";
@@ -26,7 +25,6 @@ interface IMatch {
 
 export const Matches = () => {
     const { getInstance } = useClient();
-    const navigate = useNavigate();
     const [matches, setMatches] = useState<IMatch[]>([]);
 
     // TODO: pagination
@@ -40,7 +38,7 @@ export const Matches = () => {
         let matchesDataObj = { data: [], error: null };
 
         if (deckInMatch || userInMatch) {
-            let ids_to_search: { match_id: String }[] = [];
+            let ids_to_search: { match_id: string }[] = [];
 
             if (deckInMatch) {
                 // MATCHES BY DECK

@@ -4,16 +4,6 @@ import { YGCMobileToolbar } from "./MobileToolbar";
 import { useLoadPFP } from "../../utils/useLoadPFP";
 import { useCheckSession } from "../../utils/useCheckSession";
 
-export const getUserRoute = () => {
-    const lsRes = localStorage.getItem("sb-tbdesplqufizydsciqzq-auth-token");
-    if (lsRes) {
-        const userId = JSON.parse(lsRes).user.id;
-        return "/user/?id=" + userId;
-    }
-
-    return "/login";
-}
-
 export const YGCToolbar = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
 
     const theme = useTheme();

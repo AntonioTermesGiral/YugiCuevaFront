@@ -18,14 +18,14 @@ export const FilledSearch = () => {
         const queryVal = url.searchParams.get("q");
         console.log(queryVal);
 
-        let { data: decksData, error: decksError } = await supabase.from('deck')
+        const { data: decksData, error: decksError } = await supabase.from('deck')
             .select()
             .ilike('name', `%${queryVal}%`)
             .limit(5);
 
         decksError && console.log(decksError);
 
-        let { data: usersData, error: usersError } = await supabase.from('profile')
+        const { data: usersData, error: usersError } = await supabase.from('profile')
             .select()
             .or(`display_name.ilike.%${queryVal}%,username.ilike.%${queryVal}%`)
             .limit(5);

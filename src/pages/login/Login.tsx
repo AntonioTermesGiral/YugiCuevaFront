@@ -23,7 +23,6 @@ export const Login = () => {
         return data;
     }
 
-    // TODO: login w/username
     const handleLogin = async () => {
         const supabase = getInstance();
         localStorage.clear();

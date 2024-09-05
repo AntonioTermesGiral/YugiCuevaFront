@@ -22,7 +22,8 @@ export const Profile = () => {
     const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
-    const [matches, setMatches] = useState<Tables<'match'>[]>([]);
+    // TODO: Matches implementation on profile
+    // const [matches, setMatches] = useState<Tables<'match'>[]>([]);
     const [selectedTab, setSelectedTab] = useState<TABS>("DECKS");
     const [isCurrentUser, setIsCurrentUser] = useState(false);
 
@@ -77,7 +78,7 @@ export const Profile = () => {
                         <Typography variant="h2" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>{user?.display_name}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={5} display="flex" justifyContent={{ xs: "center", sm: "flex-end" }}>
-                        <Tabs value={selectedTab} onChange={(e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
+                        <Tabs value={selectedTab} onChange={(_e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
                             <Tab label="Decks" value="DECKS" />
                             <Tab label="Matches" value="MATCHES" />
                         </Tabs>
