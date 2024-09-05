@@ -16,13 +16,21 @@ export const Login = () => {
     const [user, setUser] = useState("");
     const [pass, setPass] = useState("");
 
+    const getEmailByUsername = async (): Promise<string | null> => {
+        const supabase = getInstance();
+        const { data, error } = await supabase.rpc('get_email_by_username', { name: user });
+        error && console.log(data, error);
+        return data;
+    }
+
     // TODO: login w/username
     const handleLogin = async () => {
         const supabase = getInstance();
         localStorage.clear();
+        const searchedEmail = await getEmailByUsername();
 
         const { data: userData, error: userErr } = await supabase.auth.signInWithPassword({
-            email: user,
+            email: searchedEmail ?? user,
             password: pass
         });
 
