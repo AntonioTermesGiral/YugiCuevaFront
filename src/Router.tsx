@@ -9,12 +9,18 @@ import { Search } from "./pages/search/Search";
 import { Matches } from "./pages/matches/Matches";
 import { YGCToolbar } from "./components/layout/Toolbar";
 import { WipScreen } from "./components/WipScreen";
+import { Manage } from "./pages/manage/Manage";
 
 const routes: RouteObject[] = [
     {
         path: "/",
         element: <Login />,
         id: "login"
+    },
+    {
+        path: "/manage/*",
+        element: <Manage/>,
+        id: "manage"
     },
     {
         path: "/user/*",
@@ -34,7 +40,7 @@ const routes: RouteObject[] = [
     },
     { // TODO: To be implemented
         path: "/polls",
-        element: <div>Polls<WipScreen/></div>,
+        element: <div>Polls<WipScreen /></div>,
     },
     {
         path: "/search/*",
@@ -51,7 +57,7 @@ const routes: RouteObject[] = [
 ];
 
 const addWrapper = (route: RouteObject) => {
-    if (route.id != "login") {
+    if (route.id != "login" && route.id != "manage") {
         route.element = <YGCToolbar>{route.element as JSX.Element}</YGCToolbar>;
     }
     return route;
