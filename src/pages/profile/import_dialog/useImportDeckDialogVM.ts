@@ -152,7 +152,7 @@ export const useImportDeckDialogVM = () => {
                                     } else {
                                         alert("The deck image couldn't be uploaded...");
                                     }
-                                })
+                                }).then(() => fetch('https://yugicuevaimageloader.onrender.com').then(console.log))
                                 .finally(() => {
                                     setImportDialogOpen(false);
                                 })
