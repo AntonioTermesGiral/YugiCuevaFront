@@ -32,7 +32,7 @@ export const EditProfileDialog = () => {
                     marginTop: "10px",
                     fontSize: "2em",
                     backgroundColor: "darkgray"
-                }}>/</Button>
+                }}>&#9998;</Button>
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} PaperProps={{ sx: { padding: 4 } }}>
                 <Grid container>
                     <Grid item xs={12}>

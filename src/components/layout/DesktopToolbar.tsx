@@ -69,7 +69,7 @@ export const YGCDesktopToolbar = () => {
                                 />
                                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                                 <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearchSubmit}>
-                                    Q
+                                    &#128270;
                                 </IconButton>
                             </Paper>
                         </Grid>

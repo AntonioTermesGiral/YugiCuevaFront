@@ -15,6 +15,7 @@ export const Login = () => {
 
     const [user, setUser] = useState("");
     const [pass, setPass] = useState("");
+    const [error, setError] = useState(false);
 
     const getEmailByUsername = async (): Promise<string | null> => {
         const supabase = getInstance();
@@ -24,8 +25,9 @@ export const Login = () => {
     }
 
     const handleLogin = async () => {
-        const supabase = getInstance();
         localStorage.clear();
+
+        const supabase = getInstance();
         const searchedEmail = await getEmailByUsername();
 
         const { data: userData, error: userErr } = await supabase.auth.signInWithPassword({
@@ -33,13 +35,16 @@ export const Login = () => {
             password: pass
         });
 
-        console.log(userData, userErr);
+        userErr && console.log(userErr);
         return userData;
     }
 
     const handleEnter = (ev: KeyboardEvent) => {
         if (ev.key == "Enter") {
-            handleLogin().then((res) => navigate("/user/?id=" + res.user?.id));
+            handleLogin().then((res) => {
+                if (res.user) navigate("/user/?id=" + res.user.id);
+                else setError(true);
+            });
         }
     }
 
@@ -52,13 +57,16 @@ export const Login = () => {
                         <Typography variant="h4">Login</Typography>
                     </Grid>
                     <Grid item>
-                        <TextField variant="standard" label="Email" value={user} onChange={(e) => { setUser(e.target.value) }} />
+                        <TextField error={error} variant="standard" label="Email" value={user} onChange={(e) => { setUser(e.target.value) }} />
                     </Grid>
                     <Grid item marginBottom="1rem">
-                        <TextField variant="standard" type="password" label="Contraseña" value={pass} onChange={(e) => { setPass(e.target.value) }} />
+                        <TextField error={error} variant="standard" type="password" label="Contraseña" value={pass} onChange={(e) => { setPass(e.target.value) }} />
                     </Grid>
                     <Button onClick={() => {
-                        handleLogin().then((res) => navigate("/user/?id=" + res.user?.id));
+                        handleLogin().then((res) => {
+                            if (res.user) navigate("/user/?id=" + res.user.id);
+                            else setError(true);
+                        });
                     }}>
                         Submit
                     </Button>

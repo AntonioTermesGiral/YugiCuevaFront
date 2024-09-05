@@ -1,10 +1,10 @@
-import { Grid, Tab, Tabs, Typography } from "@mui/material"
+import { Button, Grid, Tab, Tabs, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useClient } from "../../client/useClient";
 import { ImportDeckDialog } from "./import_dialog/ImportDeckDialog";
 import { Tables } from "../../database.types";
 import { DeckCard } from "../../components/DeckCard";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { WipScreen } from "../../components/WipScreen";
 import { DARK_BLUE } from "../../constants/colors";
 import { EditProfileDialog } from "./edit_dialog/EditProfileDialog";
@@ -16,8 +16,8 @@ interface IProfileResponse {
 }
 
 export const Profile = () => {
-
     type TABS = "DECKS" | "MATCHES";
+    const navigate = useNavigate();
     const { getInstance } = useClient();
     const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
@@ -72,6 +72,24 @@ export const Profile = () => {
                         }}
                     />
                     {isCurrentUser && <EditProfileDialog />}
+                    {isCurrentUser && <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                            localStorage.clear();
+                            navigate('/');
+                        }}
+                        sx={{
+                            width: "50px",
+                            height: "50px",
+                            position: "absolute",
+                            left: { "xs": "25%", "sm": "auto" },
+                            marginTop: "150px",
+                            fontSize: "2em",
+                            backgroundColor: "darkred",
+                            minWidth: "auto",
+                            paddingBottom: "0px"
+                        }}>&#10550;</Button>}
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >

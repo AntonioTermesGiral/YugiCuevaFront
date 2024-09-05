@@ -44,7 +44,7 @@ export const YGCMobileToolbar = () => {
                 <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} PaperProps={{ sx: { backgroundColor: DARK_BLUE, color: "white" } }}>
                     <List>
                         <Grid container justifyContent="flex-end" px={2}>
-                            <IconButton sx={{ color: "white" }} onClick={() => setIsDrawerOpen(false)}>{"x"}</IconButton>
+                            <IconButton sx={{ color: "white" }} onClick={() => setIsDrawerOpen(false)}>&#10005;</IconButton>
                         </Grid>
                         <Divider sx={{ mx: 0.5, my: 2, borderColor: "white" }} />
                         <Paper sx={{ m: 1, p: '2px 4px', display: 'flex', alignItems: 'center' }}>
@@ -57,31 +57,37 @@ export const YGCMobileToolbar = () => {
                             />
                             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                             <IconButton type="button" sx={{ p: '10px', color: DARK_BLUE }} aria-label="search" onClick={handleSearchSubmit}>
-                                Q
+                                &#128270;
                             </IconButton>
                         </Paper>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/meta")}>
-                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
                                 <ListItemText primary="Meta Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/chill")}>
-                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
                                 <ListItemText primary="Chill Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/matches")}>
-                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
                                 <ListItemText primary="Matches" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/polls")}>
-                                <ListItemIcon style={{ color: "white" }}>o</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
                                 <ListItemText primary="Polls" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => handleNavigate("/polls")}>
+                                <ListItemIcon style={{ color: "white" }}>&#11168;</ListItemIcon>
+                                <ListItemText primary="Logout" />
                             </ListItemButton>
                         </ListItem>
                     </List>
@@ -99,7 +105,10 @@ export const YGCMobileToolbar = () => {
                         marginRight: 10,
                         cursor: "pointer"
                     }}
-                    onClick={() => navigate(getUserRoute())}
+                    onClick={() => {
+                        localStorage.clear();
+                        navigate('/');
+                    }}
                 />
             </Toolbar>
         </AppBar>
