@@ -64,9 +64,11 @@ export const SingleCard = () => {
                     <Grid item xs={12} md={6}>
                         <Typography variant="h4">{card?.race_type ?? "?"}</Typography>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Typography variant="h4">{card?.attribute ?? "?"}</Typography>
-                    </Grid>
+                    {card?.attribute &&
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="h4">{card.attribute}</Typography>
+                        </Grid>
+                    }
                 </Grid>
                 <Grid container>
                     <Grid item xs={12}>

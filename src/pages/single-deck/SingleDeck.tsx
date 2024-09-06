@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
 import { Enums, Tables } from "../../database.types";
 import { useNavigate } from "react-router-dom";
+import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
 
 interface IDeckContent {
     cardId: number;
@@ -22,20 +23,16 @@ interface IDeckAuthorData {
     authorId: string;
 }
 
-//type DECK_VIEW_TYPE = "NORMAL" | "COMPACT";
-
 export const SingleDeck = () => {
 
     const { getInstance } = useClient();
     const navigate = useNavigate();
     const { cardsContainerStyles, cardProperties } = singleDeckStyles();
+    const [currentUserId, setCurrentUserId] = useState<string>();
 
     const [deckData, setDeckData] = useState<Tables<'deck'>>();
     const [content, setContent] = useState<IDeckContent[]>([]);
     const [authorData, setAuthorData] = useState<IDeckAuthorData>();
-
-    // TODO: Set by preferences???
-    //const [viewType, setViewType] = useState<DECK_VIEW_TYPE>("NORMAL");
 
     const loadDeckData = async (): Promise<IDeckScreenData | undefined> => {
         const url = new URL(location.href);
@@ -43,6 +40,9 @@ export const SingleDeck = () => {
 
         if (deckID) {
             const supabase = getInstance();
+
+            const { data: { user: currentUser } } = await supabase.auth.getUser()
+            setCurrentUserId(currentUser?.id);
 
             // Deck search by id
             const { data: deckData, error: deckError } = await supabase.from('deck').select().eq("id", deckID);
@@ -98,13 +98,20 @@ export const SingleDeck = () => {
             <img height={156.4} width={107.2} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
         </Grid>;
 
-    // 2 views? 1 with all card and the other with each card and its qty
-    /* TODO: OPTIONS TO CHANGE VTYPE */
     return <Grid container direction="column" px={2} mt={2}>
         <Grid my={2}>
-            <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
-            <Typography variant="h5" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
-            <Typography variant="h5" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
+            <Grid container>
+                <Grid item xs={12} sm={9}>
+                    <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
+                </Grid>
+                {authorData?.authorId == currentUserId &&
+                    <Grid item xs={12} sm={3} display="flex" justifyContent={{ xs: 'flex-start', sm: "flex-end" }} my={2}>
+                        <EditDeckDialog />
+                    </Grid>
+                }
+            </Grid>
+            <Typography variant="h5" width="fit-content" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
+            <Typography variant="h5" width="fit-content" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
         </Grid>
         <Grid container direction="column" justifyContent="center">
             <Grid sx={cardsContainerStyles}>

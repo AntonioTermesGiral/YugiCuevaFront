@@ -1,18 +1,16 @@
-import { Button, Dialog, Typography, TextField, Grid, styled } from "@mui/material"
-import { useEditProfileDialogVM } from "./useEditProfileDialogVM";
+import { Button, Dialog, Grid, styled, TextField, Typography } from "@mui/material";
+import { useEditDeckDialogVM } from "./useEditDeckDialogVM";
 
-export const EditProfileDialog = () => {
+export const EditDeckDialog = () => {
     const {
         editDialogOpen,
         setEditDialogOpen,
-        displayName,
-        setDisplayName,
-        masterDuelRef,
-        setMasterDuelRef,
-        onChangeProfileImage,
-        originalPfpUrl,
-        handleUpdateProfile
-    } = useEditProfileDialogVM();
+        deckName,
+        setDeckName,
+        handleUpdateDeck,
+        onChangeDeckImage,
+        originalDeckPictureUrl
+    } = useEditDeckDialogVM();
 
     const DeckImageInput = styled('input')({
         clipPath: 'inset(50%)',
@@ -28,34 +26,21 @@ export const EditProfileDialog = () => {
                 sx={{
                     width: "50px",
                     height: "50px",
-                    position: "absolute",
-                    left: { "xs": "auto", "sm": "5em" },
-                    right: { "xs": "25%", "sm": "auto" },
-                    marginTop: "10px",
                     fontSize: "2em",
                     backgroundColor: "darkgray"
                 }}>&#9998;</Button>
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} PaperProps={{ sx: { padding: 4 } }}>
                 <Grid container>
                     <Grid item xs={12}>
-                        <Typography variant="h4" my={1}>Profile</Typography>
+                        <Typography variant="h4" my={1}>Deck</Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
                             sx={{ my: 1 }}
-                            label="Display Name"
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            sx={{ my: 1 }}
-                            label="Master Duel ID"
-                            value={masterDuelRef}
-                            onChange={(e) => setMasterDuelRef(e.target.value)}
+                            label="Deck Name"
+                            value={deckName}
+                            onChange={(e) => setDeckName(e.target.value)}
                         />
                     </Grid>
                     <Grid item container justifyContent="space-between">
@@ -68,32 +53,31 @@ export const EditProfileDialog = () => {
                                 endIcon="↑"
                                 sx={{ my: 1 }}
                             >
-                                Upload Profile Image
+                                Upload Deck Image
                                 <DeckImageInput
                                     type="file"
                                     accept="image/*"
-                                    onChange={onChangeProfileImage}
+                                    onChange={onChangeDeckImage}
                                 />
                             </Button>
                         </Grid>
                         <Grid item xs={12} sm={5.5}>
                             <img
-                                id="profile-image-preview"
+                                id="deck-image-preview"
                                 width="200"
-                                height="200"
-                                src={originalPfpUrl}
+                                height="150"
+                                src={originalDeckPictureUrl}
                                 style={{
-                                    backgroundImage: 'url("/images/default-profile.jpg")',
+                                    backgroundImage: 'url("/images/card-question.png")',
                                     backgroundSize: "cover",
                                     objectFit: "cover",
-                                    borderRadius: "50%",
-                                    border: "5px solid black"
+                                    border: "1px solid black"
                                 }}
                             />
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button onClick={handleUpdateProfile}>Apply</Button>
+                        <Button onClick={handleUpdateDeck}>Apply</Button>
                     </Grid>
                 </Grid>
             </Dialog>
