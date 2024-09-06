@@ -57,7 +57,7 @@ export const Login = () => {
                         <Typography variant="h4">Login</Typography>
                     </Grid>
                     <Grid item>
-                        <TextField error={error} variant="standard" label="Email" value={user} onChange={(e) => { setUser(e.target.value) }} />
+                        <TextField error={error} variant="standard" label="Username/Email" value={user} onChange={(e) => { setUser(e.target.value) }} />
                     </Grid>
                     <Grid item marginBottom="1rem">
                         <TextField error={error} variant="standard" type="password" label="Contraseña" value={pass} onChange={(e) => { setPass(e.target.value) }} />

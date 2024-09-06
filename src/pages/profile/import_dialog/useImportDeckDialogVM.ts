@@ -147,7 +147,7 @@ export const useImportDeckDialogVM = () => {
                             console.log(cardLinks);
                             linkCards(cardLinks).then(() => {
                                 handleUploadDeckImage(createdDeck.id).then((success) => {
-                                    if (success) {
+                                    if (success || !deckImage) {
                                         console.log("Import complete")
                                     } else {
                                         alert("The deck image couldn't be uploaded...");

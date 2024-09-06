@@ -2,6 +2,7 @@ import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, Li
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { DARK_BLUE } from "../../constants/colors";
+import { getUserRoute } from "../utils/getUserRoute";
 
 export const YGCMobileToolbar = () => {
     const navigate = useNavigate();
@@ -104,10 +105,7 @@ export const YGCMobileToolbar = () => {
                         marginRight: 10,
                         cursor: "pointer"
                     }}
-                    onClick={() => {
-                        localStorage.clear();
-                        navigate('/');
-                    }}
+                    onClick={() => navigate(getUserRoute())}
                 />
             </Toolbar>
         </AppBar>
