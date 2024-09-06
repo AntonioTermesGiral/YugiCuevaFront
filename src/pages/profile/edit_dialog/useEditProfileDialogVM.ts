@@ -7,6 +7,7 @@ export const useEditProfileDialogVM = () => {
     const { getInstance } = useClient();
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [displayName, setDisplayName] = useState("");
+    const [masterDuelRef, setMasterDuelRef] = useState("");
     const [profileImage, setProfileImage] = useState<File>();
     const [userId, setUserId] = useState<string>();
     const [originalPfpUrl, setOriginalPfpUrl] = useState("/images/default-profile.jpg");
@@ -26,6 +27,7 @@ export const useEditProfileDialogVM = () => {
             // Sets the values
             pfpName && setOriginalPfpUrl(pfpName);
             setDisplayName(profile[0].display_name);
+            setMasterDuelRef(profile[0].master_duel_ref);
         }
     }
 
@@ -34,7 +36,7 @@ export const useEditProfileDialogVM = () => {
 
         const { data, error } = await supabase
             .from('profile')
-            .update({ display_name: displayName })
+            .update({ display_name: displayName, master_duel_ref: masterDuelRef })
             .eq('id', userId)
             .select();
 
@@ -113,6 +115,8 @@ export const useEditProfileDialogVM = () => {
         setEditDialogOpen,
         displayName,
         setDisplayName,
+        masterDuelRef,
+        setMasterDuelRef,
         originalPfpUrl,
         onChangeProfileImage,
         handleUpdateProfile

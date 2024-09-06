@@ -7,6 +7,8 @@ export const EditProfileDialog = () => {
         setEditDialogOpen,
         displayName,
         setDisplayName,
+        masterDuelRef,
+        setMasterDuelRef,
         onChangeProfileImage,
         originalPfpUrl,
         handleUpdateProfile
@@ -45,6 +47,15 @@ export const EditProfileDialog = () => {
                             label="Display Name"
                             value={displayName}
                             onChange={(e) => setDisplayName(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            sx={{ my: 1 }}
+                            label="Master Duel ID"
+                            value={masterDuelRef}
+                            onChange={(e) => setMasterDuelRef(e.target.value)}
                         />
                     </Grid>
                     <Grid item container justifyContent="space-between">

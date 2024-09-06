@@ -94,6 +94,9 @@ export const Profile = () => {
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >
                         <Typography variant="h2" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>{user?.display_name}</Typography>
+                        {user?.master_duel_ref &&
+                            <Typography variant="subtitle1" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>Master Duel ID: <b>{user.master_duel_ref}</b></Typography>
+                        }
                     </Grid>
                     <Grid item xs={12} sm={5} display="flex" justifyContent={{ xs: "center", sm: "flex-end" }}>
                         <Tabs value={selectedTab} onChange={(_e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
