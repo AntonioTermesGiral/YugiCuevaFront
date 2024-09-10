@@ -80,86 +80,95 @@ export const useImportDeckDialogVM = () => {
 
     const handleUploadDeck = () => {
         //console.log(parseURL("ydke://iNIjAMWM2wTFjNsEMbESADGxEgAxsRIAlRdjBJUXYwSVF2MEDOCVAAzglQAM4JUAj/cEBY/3BAWP9wQFcxtSAHMbUgBzG1IAFbaGBRW2hgUVtoYFlzRqBbbP8QS2z/EEOy/VATsv1QE7L9UBC0LGBAtCxgQLQsYE25VrAtuVawLblWsC+5oxA/uaMQPN8n4BzfJ+Ac3yfgGhZu4EoWbuBKFm7gQ=!jqxcAfiugQUHFjYA9jypBUs8yQNr1MwEdzBNBGBMZgUx8FcCwUd8BMD0oQCxlvoEsZb6BOj8vQTrqosF!20awBNtGsATbRrAE7I8BAOyPAQDPCQAAHddGA2927wBvdu8A+wR4AvsEeAL7BHgCYHT3BGB09wRgdPcE!"));
+        if (deckName.trim() === "" || ydkeURL.trim() === "") {
+            alert("Ponle un nombre y una ydke url al deck.");
+            return;
+        }
+        
+        try {
+            const deckCodes = parseURL(ydkeURL);
+            const mainCodes = [...deckCodes.main];
+            const extraCodes = [...deckCodes.extra];
+            const sideCodes = [...deckCodes.side];
 
-        const deckCodes = parseURL(ydkeURL);
-        const mainCodes = [...deckCodes.main];
-        const extraCodes = [...deckCodes.extra];
-        const sideCodes = [...deckCodes.side];
+            const mainCardsQuantity = countCodes(mainCodes);
+            const extraCardsQuantity = countCodes(extraCodes);
+            const sideCardsQuantity = countCodes(sideCodes);
 
-        const mainCardsQuantity = countCodes(mainCodes);
-        const extraCardsQuantity = countCodes(extraCodes);
-        const sideCardsQuantity = countCodes(sideCodes);
-
-        console.log(mainCardsQuantity, extraCardsQuantity, sideCardsQuantity);
-        const uniqueCards = [...new Set([...mainCodes, ...extraCodes, ...sideCodes])];
-        getCardsInDBByIds(uniqueCards).then((cardsInDB) => {
-            const cardsNOTInDB = uniqueCards.filter((card) => !cardsInDB.includes(card));
-            importCards(cardsNOTInDB).then((res) => {
-                const parsedData: Tables<'card'>[] = res.map((card) => {
-                    return {
-                        id: card.id ?? null,
-                        name: card.name ?? null,
-                        image: null,
-                        type: card.type,
-                        description: card.desc ?? null,
-                        ygoprodeck_url: card.ygoprodeck_url,
-                        race_type: card.race ?? null,
-                        level: card.level ?? null,
-                        attribute: card.attribute ?? null,
-                        archetype: card.archetype ?? null,
-                        atk: card.atk ?? null,
-                        def: card.def ?? null,
-                        linkval: card.linkval ?? null
-                    }
-                });
-                console.log(parsedData);
-                exportCards(parsedData).then(() => {
-                    createDeck().then((createdDeck) => {
-                        if (createdDeck) {
-                            const cardLinks: Tables<'card_in_deck'>[] = [];
-                            mainCardsQuantity.forEach((v, k) => {
-                                cardLinks.push({
-                                    card_id: k,
-                                    quantity: v,
-                                    deck_id: createdDeck.id,
-                                    position: "MAIN"
-                                })
-                            })
-
-                            extraCardsQuantity.forEach((v, k) => {
-                                cardLinks.push({
-                                    card_id: k,
-                                    quantity: v,
-                                    deck_id: createdDeck.id,
-                                    position: "EXTRA"
-                                })
-                            })
-
-                            sideCardsQuantity.forEach((v, k) => {
-                                cardLinks.push({
-                                    card_id: k,
-                                    quantity: v,
-                                    deck_id: createdDeck.id,
-                                    position: "SIDE"
-                                })
-                            })
-
-                            console.log(cardLinks);
-                            linkCards(cardLinks).then(() => {
-                                handleUploadDeckImage(createdDeck.id).then((success) => {
-                                    if (success || !deckImage) {
-                                        console.log("Import complete")
-                                    } else {
-                                        alert("The deck image couldn't be uploaded...");
-                                    }
-                                }).finally(() => setImportDialogOpen(false))
-                            });
+            console.log(mainCardsQuantity, extraCardsQuantity, sideCardsQuantity);
+            const uniqueCards = [...new Set([...mainCodes, ...extraCodes, ...sideCodes])];
+            getCardsInDBByIds(uniqueCards).then((cardsInDB) => {
+                const cardsNOTInDB = uniqueCards.filter((card) => !cardsInDB.includes(card));
+                importCards(cardsNOTInDB).then((res) => {
+                    const parsedData: Tables<'card'>[] = res.map((card) => {
+                        return {
+                            id: card.id ?? null,
+                            name: card.name ?? null,
+                            image: null,
+                            type: card.type,
+                            description: card.desc ?? null,
+                            ygoprodeck_url: card.ygoprodeck_url,
+                            race_type: card.race ?? null,
+                            level: card.level ?? null,
+                            attribute: card.attribute ?? null,
+                            archetype: card.archetype ?? null,
+                            atk: card.atk ?? null,
+                            def: card.def ?? null,
+                            linkval: card.linkval ?? null
                         }
-                    })
-                });
-            });
-        })
+                    });
+                    console.log(parsedData);
+                    exportCards(parsedData).then(() => {
+                        createDeck().then((createdDeck) => {
+                            if (createdDeck) {
+                                const cardLinks: Tables<'card_in_deck'>[] = [];
+                                mainCardsQuantity.forEach((v, k) => {
+                                    cardLinks.push({
+                                        card_id: k,
+                                        quantity: v,
+                                        deck_id: createdDeck.id,
+                                        position: "MAIN"
+                                    })
+                                })
 
+                                extraCardsQuantity.forEach((v, k) => {
+                                    cardLinks.push({
+                                        card_id: k,
+                                        quantity: v,
+                                        deck_id: createdDeck.id,
+                                        position: "EXTRA"
+                                    })
+                                })
+
+                                sideCardsQuantity.forEach((v, k) => {
+                                    cardLinks.push({
+                                        card_id: k,
+                                        quantity: v,
+                                        deck_id: createdDeck.id,
+                                        position: "SIDE"
+                                    })
+                                })
+
+                                console.log(cardLinks);
+                                linkCards(cardLinks).then(() => {
+                                    handleUploadDeckImage(createdDeck.id).then((success) => {
+                                        if (success || !deckImage) {
+                                            console.log("Import complete")
+                                        } else {
+                                            alert("The deck image couldn't be uploaded...");
+                                        }
+                                    }).catch(() => alert("The deck image couldn't be uploaded..."))
+                                        .finally(() => setImportDialogOpen(false))
+                                }).catch(() => alert("Sa roto en el peor momento posible, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: FCKFCK"));
+                            }
+                        }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: DIKSAD"));
+                    }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: JWEXPL"));
+                }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: INMIGR"));
+            }).catch(() => alert("Sa roto, intenta de nuevo o disele a Tontonio, Codigo de error: PNIGGE"));
+        } catch (err) {
+            console.log("Import error: " + err);
+            alert("Algo ha salido mal, revisa la url usada (pruebala el yugioh prodeck o algo) o habla con Tontonio.");
+        }
     }
 
     const handleUploadDeckImage = async (deckId: string) => {

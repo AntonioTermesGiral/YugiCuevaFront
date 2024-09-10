@@ -50,6 +50,16 @@ export const Profile = () => {
         return undefined;
     }
 
+    const getProfileFontSize = () => {
+        const breakingPoint = 10;
+        if (user?.display_name && user.display_name.length > breakingPoint) {
+            const nameLen = user.display_name.length
+            const res = 3.75 - (0.25 * ((nameLen - breakingPoint)/2));
+
+            return `${res}rem`
+        }
+        return undefined;
+    }
 
     useEffect(() => {
         getUserData().then((res) => {
@@ -93,7 +103,7 @@ export const Profile = () => {
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >
-                        <Typography variant="h2" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>{user?.display_name}</Typography>
+                        <Typography variant="h2" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }} fontSize={getProfileFontSize()}>{user?.display_name}</Typography>
                         {user?.master_duel_ref &&
                             <Typography variant="subtitle1" my={{ xs: 2, sm: 0 }} textAlign={{ xs: "center", sm: "left" }}>Master Duel ID: <b>{user.master_duel_ref}</b></Typography>
                         }
