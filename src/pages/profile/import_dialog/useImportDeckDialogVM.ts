@@ -154,6 +154,7 @@ export const useImportDeckDialogVM = () => {
                                     handleUploadDeckImage(createdDeck.id).then((success) => {
                                         if (success || !deckImage) {
                                             console.log("Import complete")
+                                            location.reload();
                                         } else {
                                             alert("The deck image couldn't be uploaded...");
                                         }
