@@ -123,7 +123,7 @@ export const Profile = () => {
                         <Grid container mt={2} spacing={4}>
                             {decks.map((deck) => (
                                 <Grid display="flex" justifyContent="center" key={deck.id} item xs={12} sm={4} md={3} lg={2} mb={2}>
-                                    <DeckCard deck={deck} />
+                                    <DeckCard deck={deck} hideOwnerInfo />
                                 </Grid>
                             ))}
                         </Grid>

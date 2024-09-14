@@ -7,13 +7,15 @@ import { useClient } from "../client/useClient";
 interface IDeckCard {
     deck: Tables<"deck">;
     hideTierInfo?: boolean;
+    hideOwnerInfo?: boolean;
 }
 
-export const DeckCard = ({ deck, hideTierInfo }: IDeckCard) => {
+export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
     const navigate = useNavigate();
     const { getInstance } = useClient();
     const supabase = getInstance();
     const [hasImage, setHasImage] = useState(false);
+    const [ownerName, setOwnerName] = useState<string>();
 
     const handleSearchImage = async () => {
         const { data, error } = await supabase
@@ -26,6 +28,16 @@ export const DeckCard = ({ deck, hideTierInfo }: IDeckCard) => {
             });
 
         setHasImage(!error && data.length > 0);
+
+        const { data: username, error: usernameError } = await supabase
+            .from('profile')
+            .select('username')
+            .eq('id', deck.owner);
+
+        if (username[0]) {
+            setOwnerName(username[0].username);
+        }
+        usernameError && console.log("Owner get error on deck", deck.id, ":", usernameError);
     }
 
     useEffect(() => {
@@ -46,6 +58,9 @@ export const DeckCard = ({ deck, hideTierInfo }: IDeckCard) => {
                 <Typography gutterBottom variant="h5" component="div">
                     {deck.name}
                 </Typography>
+                {!hideOwnerInfo && <Typography variant="body2" color="text.secondary">
+                    Owner: {ownerName ?? "?"}
+                </Typography>}
                 {!hideTierInfo && <Typography variant="body2" color="text.secondary">
                     Deck Stats (Tierlist)
                 </Typography>}
