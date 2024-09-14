@@ -29,15 +29,15 @@ export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
 
         setHasImage(!error && data.length > 0);
 
-        const { data: username, error: usernameError } = await supabase
+        const { data: dname, error: dnameError } = await supabase
             .from('profile')
-            .select('username')
+            .select('display_name')
             .eq('id', deck.owner);
 
-        if (username[0]) {
-            setOwnerName(username[0].username);
+        if (dname[0]) {
+            setOwnerName(dname[0].display_name);
         }
-        usernameError && console.log("Owner get error on deck", deck.id, ":", usernameError);
+        dnameError && console.log("Owner get error on deck", deck.id, ":", dnameError);
     }
 
     useEffect(() => {
