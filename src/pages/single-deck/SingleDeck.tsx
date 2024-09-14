@@ -59,7 +59,7 @@ export const SingleDeck = () => {
             const dContent = linksData.map((link: Tables<'card_in_deck'>) => {
                 return {
                     cardId: link.card_id,
-                    cardImage: import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + link.card_id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT,
+                    cardImage: import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + link.card_id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT + "?ver=" + new Date().getTime(),
                     qty: link.quantity,
                     position: link.position
                 } as IDeckContent;

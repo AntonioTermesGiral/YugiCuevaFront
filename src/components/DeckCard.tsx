@@ -49,7 +49,7 @@ export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
             <CardMedia
                 sx={{ height: 150, width: "100%" }}
                 image={hasImage ?
-                    import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT
+                    import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT + "?ver=" + new Date().getTime()
                     : "/images/card-question.png"
                 }
                 title="deck"

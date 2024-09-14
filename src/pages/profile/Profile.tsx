@@ -54,7 +54,7 @@ export const Profile = () => {
         const breakingPoint = 10;
         if (user?.display_name && user.display_name.length > breakingPoint) {
             const nameLen = user.display_name.length
-            const res = 3.75 - (0.25 * ((nameLen - breakingPoint)/2));
+            const res = 3.75 - (0.25 * ((nameLen - breakingPoint) / 2));
 
             return `${res}rem`
         }
@@ -72,7 +72,7 @@ export const Profile = () => {
         <Grid container direction='column' sx={{ alignItems: "center" }}>
             <Grid item container minHeight="30vh" alignItems="end" sx={{ backgroundColor: DARK_BLUE, py: 4, px: 2 }}>
                 <Grid item xs={12} md={3} lg={2} display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
-                    <img width="200" height="200" src={import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + user?.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT}
+                    <img width="200" height="200" src={import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + user?.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT + "?ver=" + new Date().getTime()}
                         style={{
                             backgroundImage: 'url("/images/default-profile.jpg")',
                             backgroundSize: "cover",

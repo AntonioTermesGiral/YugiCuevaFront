@@ -20,7 +20,7 @@ export const useEditDeckDialogVM = () => {
             const { data: deckData, error } = await supabase.from('deck').select().eq('id', currentDeckId);
             error && console.log(error, deckData);
 
-            const currentDeckPic = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + currentDeckId + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT;
+            const currentDeckPic = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + currentDeckId + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT + "?ver=" + new Date().getTime();
 
             // Sets the values
             currentDeckPic && setOriginalDeckPictureUrl(currentDeckPic);

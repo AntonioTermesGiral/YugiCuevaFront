@@ -36,7 +36,7 @@ export const SingleCard = () => {
             <Grid item xs={6} md={4}>
                 <Grid>
                     <img
-                        src={import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + card?.id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT}
+                        src={import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + card?.id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT + "?ver=" + new Date().getTime()}
                         height="391"
                         width="268"
                         style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }}

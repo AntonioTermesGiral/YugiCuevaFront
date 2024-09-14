@@ -22,7 +22,7 @@ export const useEditProfileDialogVM = () => {
             const { data: profile, error } = await supabase.from('profile').select().eq('id', JSON.parse(supastorage).user.id);
             error && console.log(error, profile);
 
-            const pfpName = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + JSON.parse(supastorage).user.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT;
+            const pfpName = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + JSON.parse(supastorage).user.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT + "?ver=" + new Date().getTime();
 
             // Sets the values
             pfpName && setOriginalPfpUrl(pfpName);

@@ -19,7 +19,7 @@ export const UserCard = ({ user }: IUserCard) => {
         <Card>
             <CardMedia
                 sx={{ height: 150, width: "100%" }}
-                image={pfpUrl}
+                image={pfpUrl + "?ver=" + new Date().getTime()}
                 title="user"
             />
             <CardContent>
