@@ -42,6 +42,7 @@ export const useImportDeckDialogVM = () => {
             const supabase = getInstance();
             const { data, error } = await supabase.from('card').insert(cards).select();
             console.log(data, error);
+            if (error) throw new Error("No se ha podido exportar")
         }
     }
 
@@ -163,7 +164,7 @@ export const useImportDeckDialogVM = () => {
                                 }).catch(() => alert("Sa roto en el peor momento posible, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: FCKFCK"));
                             }
                         }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: DIKSAD"));
-                    }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: JWEXPL"));
+                    }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, (por si acaso revisa que las cartas del deck no tengan un diseño alternativo) Codigo de error: JWEXPL"));
                 }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: INMIGR"));
             }).catch(() => alert("Sa roto, intenta de nuevo o disele a Tontonio, Codigo de error: PNIGGE"));
         } catch (err) {
