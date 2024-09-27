@@ -62,13 +62,13 @@ export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
                     Owner: {ownerName ?? "?"}
                 </Typography>}
                 {!hideTierInfo && <Typography variant="body2" color="text.secondary">
-                    Deck Stats (Tierlist)
+                    Tierlist: {deck.tierlist ?? "?"}
                 </Typography>}
                 {!hideTierInfo && <Typography variant="body2" color="text.secondary">
-                    (Tier)
+                    Tier: {deck.tier ?? "?"}
                 </Typography>}
                 <Typography variant="body2" color="text.secondary">
-                    (Points)
+                    Points(WIP): {deck.points ?? 0}
                 </Typography>
             </CardContent>
             <CardActions>
