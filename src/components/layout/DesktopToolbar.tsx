@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "../utils/getUserRoute";
 import { DARK_BLUE } from "../../constants/colors";
+import SearchIcon from '@mui/icons-material/Search';
 
 export const YGCDesktopToolbar = () => {
     const navigate = useNavigate();
@@ -69,7 +70,7 @@ export const YGCDesktopToolbar = () => {
                                 />
                                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                                 <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearchSubmit}>
-                                    &#128270;
+                                    <SearchIcon />
                                 </IconButton>
                             </Paper>
                         </Grid>

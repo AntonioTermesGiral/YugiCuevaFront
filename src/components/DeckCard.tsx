@@ -1,8 +1,9 @@
-import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@mui/material"
+import { Card, CardMedia, CardContent, Typography, Grid, IconButton } from "@mui/material"
 import { Tables } from "../database.types"
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useClient } from "../client/useClient";
+import InfoIcon from '@mui/icons-material/Info';
 
 interface IDeckCard {
     deck: Tables<"deck">;
@@ -55,27 +56,33 @@ export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
                 title="deck"
             />
             <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                    {deck.name}
-                </Typography>
-                {!hideOwnerInfo && <Typography variant="body2" color="text.secondary">
-                    Owner: {ownerName ?? "?"}
-                </Typography>}
-                {!hideTierInfo && <Typography variant="body2" color="text.secondary">
-                    Tierlist: {deck.tierlist ?? "?"}
-                </Typography>}
-                {!hideTierInfo && <Typography variant="body2" color="text.secondary">
-                    Tier: {deck.tier ?? "?"}
-                </Typography>}
-                <Typography variant="body2" color="text.secondary">
-                    Points(WIP): {deck.points ?? 0}
-                </Typography>
+                <Grid container justifyContent="space-between" alignItems="flex-start">
+                    <Grid item xs={9}>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {deck.name}
+                        </Typography>
+                        {!hideOwnerInfo && <Typography variant="body2" color="text.secondary">
+                            Owner: {ownerName ?? "?"}
+                        </Typography>}
+                        {!hideTierInfo && <Typography variant="body2" color="text.secondary">
+                            Tierlist: {deck.tierlist ?? "?"}
+                        </Typography>}
+                        {!hideTierInfo && <Typography variant="body2" color="text.secondary">
+                            Tier: {deck.tier ?? "?"}
+                        </Typography>}
+                        <Typography variant="body2" color="text.secondary">
+                            Points(WIP): {deck.points ?? 0}
+                        </Typography>
+                    </Grid>
+                    <IconButton
+                        size="small"
+                        onClick={() => { navigate("/deck/?id=" + deck.id) }}
+                        sx={{ color: "#242424", p: 0 }}
+                    >
+                        <InfoIcon />
+                    </IconButton>
+                </Grid>
             </CardContent>
-            <CardActions>
-                <Button size="small" onClick={() => {
-                    navigate("/deck/?id=" + deck.id)
-                }}>Deck details →</Button>
-            </CardActions>
         </Card>
     )
 }

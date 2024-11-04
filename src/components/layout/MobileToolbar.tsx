@@ -3,6 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { DARK_BLUE } from "../../constants/colors";
 import { getUserRoute } from "../utils/getUserRoute";
+import SearchIcon from '@mui/icons-material/Search';
+import LogoutIcon from '@mui/icons-material/Logout';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+import PollIcon from '@mui/icons-material/Poll';
+import MenuIcon from '@mui/icons-material/Menu';
 
 export const YGCMobileToolbar = () => {
     const navigate = useNavigate();
@@ -39,12 +47,12 @@ export const YGCMobileToolbar = () => {
                     sx={{ mr: 2 }}
                     onClick={() => setIsDrawerOpen(true)}
                 >
-                    =
+                    <MenuIcon/>
                 </IconButton>
                 <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} PaperProps={{ sx: { backgroundColor: DARK_BLUE, color: "white" } }}>
                     <List>
                         <Grid container justifyContent="flex-end" px={2}>
-                            <IconButton sx={{ color: "white" }} onClick={() => setIsDrawerOpen(false)}>&#10005;</IconButton>
+                            <IconButton sx={{ color: "white" }} onClick={() => setIsDrawerOpen(false)}><ChevronLeftIcon /></IconButton>
                         </Grid>
                         <Divider sx={{ mx: 0.5, my: 2, borderColor: "white" }} />
                         <Paper sx={{ m: 1, p: '2px 4px', display: 'flex', alignItems: 'center' }}>
@@ -57,36 +65,36 @@ export const YGCMobileToolbar = () => {
                             />
                             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                             <IconButton type="button" sx={{ p: '10px', color: DARK_BLUE }} aria-label="search" onClick={handleSearchSubmit}>
-                                &#128270;
+                                <SearchIcon />
                             </IconButton>
                         </Paper>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/meta")}>
-                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}><ViewListIcon/></ListItemIcon>
                                 <ListItemText primary="Meta Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/tierlists/chill")}>
-                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}><FormatListBulletedIcon/></ListItemIcon>
                                 <ListItemText primary="Chill Tierlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/matches")}>
-                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}><HistoryToggleOffIcon/></ListItemIcon>
                                 <ListItemText primary="Matches" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/polls")}>
-                                <ListItemIcon style={{ color: "white" }}>&#9737;</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}><PollIcon/></ListItemIcon>
                                 <ListItemText primary="Polls" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => handleNavigate("/polls")}>
-                                <ListItemIcon style={{ color: "white" }}>&#11168;</ListItemIcon>
+                                <ListItemIcon style={{ color: "white" }}><LogoutIcon /></ListItemIcon>
                                 <ListItemText primary="Logout" />
                             </ListItemButton>
                         </ListItem>

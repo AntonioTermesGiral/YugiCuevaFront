@@ -1,19 +1,43 @@
-import { Grid, Paper, Typography } from "@mui/material";
+import { Grid, GridProps, Paper, Typography } from "@mui/material";
 import { Enums, Tables } from "../../database.types"
 import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
-import { DeckCard } from "../../components/DeckCard";
 import { maxTier } from "../../constants/tiers";
 import { useLocation } from "react-router-dom";
+import { TierListDeck } from "./TierListDeck";
 
 interface ITierList {
     variant: Enums<"Tierlist">;
+}
+
+const colorLoop = [
+    '#ff7f7f',
+    '#ffbf7f',
+    '#ffdf7f',
+    '#FFFF7F',
+    '#bfff7f',
+    '#7fff7f',
+    '#7fffff',
+    '#7fbfff',
+    '#7f7fff',
+    '#ff7fff',
+    '#bf7fbf'
+]
+
+const getBackgroundColorLoop = (index: number) => {
+    let currentIndex = index;
+    while (currentIndex > colorLoop.length - 1) {
+        currentIndex -= colorLoop.length;
+    }
+
+    return colorLoop[currentIndex];
 }
 
 export const TierList = ({ variant }: ITierList) => {
     const { getInstance } = useClient();
     const loc = useLocation();
     const [sortedDecks, setSortedDecks] = useState<Map<number, Tables<"deck">[]>>(new Map());
+    const styles = getStyles();
 
     const getTierListData = async () => {
         const supabase = getInstance();
@@ -65,22 +89,22 @@ export const TierList = ({ variant }: ITierList) => {
     return (
         <Grid container direction="column" alignItems="center" pb={3}>
             <Typography variant="h4" my={2}>TIERLIST: {variant}</Typography>
-            <Paper sx={{ width: "80vw", }}>
-                {[...sortedDecks].map((tierData) => {
+            <Paper sx={{ width: "95vw", backgroundColor: "transparent" }}>
+                {[...sortedDecks].map((tierData, index) => {
                     const currentTier = tierData[0];
                     const currentTierDecks = tierData[1];
                     return (
-                        <Grid container key={currentTier} borderBottom="1px solid black">
-                            <Grid item display="flex" alignItems="center" justifyContent="center" xs={2} borderRight="1px solid black" textAlign="center" py={2}>
-                                {isNaN(currentTier) ? <Typography variant="h5">No Tier</Typography> : <Typography variant="h4">{currentTier}</Typography>}
+                        <Grid container key={currentTier} border="6px solid black" borderBottom={index === sortedDecks.size - 1 ? "6px solid black" : "none"} minHeight="10rem">
+                            <Grid {...styles.tier} sx={{ backgroundColor: getBackgroundColorLoop(index) }}>
+                                {isNaN(currentTier) ? <Typography variant="h5">No Tier</Typography> : <Typography variant="h4" fontSize="4rem">{currentTier}</Typography>}
                             </Grid>
-                            <Grid item container alignItems="center" xs={10}>
+                            <Grid item container alignItems="center" xs={10} spacing={1} p={1}>
                                 {currentTierDecks.map((currentDeck) => (
-                                    <Grid item key={currentDeck.id} m={1} minWidth="200px">
-                                        <DeckCard deck={currentDeck} hideTierInfo />
+                                    <Grid item key={currentDeck.id} xs={6} sm={4} md={2}>
+                                        <TierListDeck deck={currentDeck} />
                                     </Grid>
                                 ))}
-                                {currentTierDecks.length == 0 && <Typography variant="h5" ml={1}>No Decks...</Typography>}
+                                {currentTierDecks.length == 0 && <Typography variant="h5" color="white" ml={1}>No Decks...</Typography>}
                             </Grid>
                         </Grid>
                     )
@@ -88,4 +112,21 @@ export const TierList = ({ variant }: ITierList) => {
             </Paper>
         </Grid>
     )
+}
+
+const getStyles = () => {
+    const tier: GridProps = {
+        item: true,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        xs: 2,
+        borderRight: "6px solid black",
+        textAlign: "center",
+        py: 2,
+    }
+
+    return {
+        tier
+    }
 }

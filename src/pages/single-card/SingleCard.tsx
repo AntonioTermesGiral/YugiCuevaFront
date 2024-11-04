@@ -76,10 +76,12 @@ export const SingleCard = () => {
                         {card?.linkval && <Typography variant="h4"> Link Rating: {card.linkval}</Typography>}
                     </Grid>
                     <Grid item xs={6}>
-                        {card?.atk && <Typography variant="h4">Atk: {card.atk}</Typography>}
+                        {(card?.atk !== null && card?.atk !== undefined) &&
+                            <Typography variant="h4">Atk: {card.atk}</Typography>}
                     </Grid>
                     <Grid item xs={6}>
-                        {card?.def && <Typography variant="h4">Def: {card.def}</Typography>}
+                        {(card?.def !== null && card?.def !== undefined) &&
+                            <Typography variant="h4">Def: {card.def}</Typography>}
                     </Grid>
                 </Grid>
                 <Grid>

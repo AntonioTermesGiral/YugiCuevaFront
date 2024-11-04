@@ -1,4 +1,4 @@
-import { Grid, GridProps, SxProps, Theme, Typography } from "@mui/material";
+import { Grid, GridProps, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
 import { Enums, Tables } from "../../database.types";
@@ -24,7 +24,6 @@ interface IDeckAuthorData {
 }
 
 export const SingleDeck = () => {
-
     const { getInstance } = useClient();
     const navigate = useNavigate();
     const { cardsContainerStyles, cardProperties } = singleDeckStyles();
@@ -33,6 +32,10 @@ export const SingleDeck = () => {
     const [deckData, setDeckData] = useState<Tables<'deck'>>();
     const [content, setContent] = useState<IDeckContent[]>([]);
     const [authorData, setAuthorData] = useState<IDeckAuthorData>();
+
+    const theme = useTheme();
+    const matchesMD = useMediaQuery(theme.breakpoints.up('sm'));
+    const matchesLG = useMediaQuery(theme.breakpoints.up('md'));
 
     const loadDeckData = async (): Promise<IDeckScreenData | undefined> => {
         const url = new URL(location.href);
@@ -87,15 +90,22 @@ export const SingleDeck = () => {
         });
     }, []);
 
+    const getCardSizes = () => {
+        if (matchesLG) return { height: 156.4, width: 107.2 };
+        if (matchesMD) return { height: 117.3, width: 80.4 };
+        if (!matchesMD) return { height: 78.2, width: 53.6 };
+        return { height: 156.4, width: 107.2 };
+    }
+
     const DeckCard = ({ card, i }: { card: IDeckContent, i: number }) =>
         <Grid {...cardProperties} key={card.cardId + "card" + i}
             onClick={() => navigate("/card/?id=" + card.cardId)}>
-            <Grid position="absolute" right="70%" left="30%" bottom="2.5rem">
-                <Typography variant="h3" sx={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", color: "white" }}>
+            <Grid position="absolute" right="10px" bottom="10px">
+                <Typography variant={matchesLG ? "h3" : matchesMD ? "h4" : "h5"} sx={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", color: "white" }}>
                     x{card.qty}
                 </Typography>
             </Grid>
-            <img height={156.4} width={107.2} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
+            <img height={getCardSizes().height} width={getCardSizes().width} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
         </Grid>;
 
     return <Grid container direction="column" px={2} mt={2}>
@@ -116,17 +126,17 @@ export const SingleDeck = () => {
             }
         </Grid>
         <Grid container direction="column" justifyContent="center">
-            <Grid sx={cardsContainerStyles}>
+            <Grid {...cardsContainerStyles}>
                 {content.filter((c) => c.position == "MAIN").map((card, i) => (
                     <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
             </Grid>
-            <Grid sx={cardsContainerStyles}>
+            <Grid {...cardsContainerStyles}>
                 {content.filter((c) => c.position == "EXTRA").map((card, i) => (
                     <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
             </Grid>
-            <Grid sx={cardsContainerStyles}>
+            <Grid {...cardsContainerStyles}>
                 {content.filter((c) => c.position == "SIDE").map((card, i) => (
                     <DeckCard card={card} i={i} key={card.cardId + i} />
                 ))}
@@ -136,28 +146,23 @@ export const SingleDeck = () => {
 };
 
 const singleDeckStyles = () => {
-
-    const cardsContainerStyles: SxProps<Theme> = {
-        backgroundColor: "lightgray",
-        borderRadius: "30px",
-        p: "1rem",
+    const cardsContainerStyles: GridProps = {
+        style: { backgroundColor: "lightgray" },
+        borderRadius: "10px",
+        p: "0.5rem",
         my: 2,
-        display: "flex",
-        flexWrap: "wrap",
-        flexGrow: 1
+        container: true
     }
 
     const cardProperties: GridProps = {
         item: true,
-        px: 2,
-        py: 1,
+        p: "1px",
         sx: {
             ":hover": {
                 scale: "120%"
             }
         },
-        position: "relative",
-        maxWidth: "100%"
+        position: "relative"
     }
 
     return {

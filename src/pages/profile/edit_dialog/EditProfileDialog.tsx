@@ -1,5 +1,6 @@
 import { Button, Dialog, Typography, TextField, Grid, styled } from "@mui/material"
 import { useEditProfileDialogVM } from "./useEditProfileDialogVM";
+import EditIcon from '@mui/icons-material/Edit';
 
 export const EditProfileDialog = () => {
     const {
@@ -34,7 +35,7 @@ export const EditProfileDialog = () => {
                     marginTop: "10px",
                     fontSize: "2em",
                     backgroundColor: "darkgray"
-                }}>&#9998;</Button>
+                }}><EditIcon/></Button>
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} PaperProps={{ sx: { padding: 4 } }}>
                 <Grid container>
                     <Grid item xs={12}>

@@ -9,6 +9,7 @@ import { WipScreen } from "../../components/WipScreen";
 import { DARK_BLUE } from "../../constants/colors";
 import { EditProfileDialog } from "./edit_dialog/EditProfileDialog";
 import { LS_USER_DATA_KEY } from "../../constants/keys";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
@@ -99,7 +100,7 @@ export const Profile = () => {
                             backgroundColor: "darkred",
                             minWidth: "auto",
                             paddingBottom: "0px"
-                        }}>&#10550;</Button>}
+                        }}><LogoutIcon/></Button>}
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >
