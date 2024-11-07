@@ -79,13 +79,21 @@ export const useImportDeckDialogVM = () => {
         console.log(data, error);
     }
 
+    const handleDeckRollback = async (deckId: string) => {
+        const supabase = getInstance();
+        const { removedLinks, removedLinksError } = await supabase.from('card_in_deck').delete().eq('deck_id', deckId);
+        console.log("Links Removal: ", removedLinks, removedLinksError);
+        const { removedDeck, removedDeckError } = await supabase.from('deck').deck().delete().eq('id', deckId);
+        console.log("Deck Removal: ", removedDeck, removedDeckError);
+    }
+
     const handleUploadDeck = () => {
         //console.log(parseURL("ydke://iNIjAMWM2wTFjNsEMbESADGxEgAxsRIAlRdjBJUXYwSVF2MEDOCVAAzglQAM4JUAj/cEBY/3BAWP9wQFcxtSAHMbUgBzG1IAFbaGBRW2hgUVtoYFlzRqBbbP8QS2z/EEOy/VATsv1QE7L9UBC0LGBAtCxgQLQsYE25VrAtuVawLblWsC+5oxA/uaMQPN8n4BzfJ+Ac3yfgGhZu4EoWbuBKFm7gQ=!jqxcAfiugQUHFjYA9jypBUs8yQNr1MwEdzBNBGBMZgUx8FcCwUd8BMD0oQCxlvoEsZb6BOj8vQTrqosF!20awBNtGsATbRrAE7I8BAOyPAQDPCQAAHddGA2927wBvdu8A+wR4AvsEeAL7BHgCYHT3BGB09wRgdPcE!"));
         if (deckName.trim() === "" || ydkeURL.trim() === "") {
             alert("Ponle un nombre y una ydke url al deck.");
             return;
         }
-        
+
         try {
             const deckCodes = parseURL(ydkeURL);
             const mainCodes = [...deckCodes.main];
@@ -98,8 +106,11 @@ export const useImportDeckDialogVM = () => {
 
             console.log(mainCardsQuantity, extraCardsQuantity, sideCardsQuantity);
             const uniqueCards = [...new Set([...mainCodes, ...extraCodes, ...sideCodes])];
+
+            // Searches the cards in the db
             getCardsInDBByIds(uniqueCards).then((cardsInDB) => {
                 const cardsNOTInDB = uniqueCards.filter((card) => !cardsInDB.includes(card));
+                // Gets the non existing cards from the ygoprodeck api
                 importCards(cardsNOTInDB).then((res) => {
                     const parsedData: Tables<'card'>[] = res.map((card) => {
                         return {
@@ -119,7 +130,9 @@ export const useImportDeckDialogVM = () => {
                         }
                     });
                     console.log(parsedData);
+                    // Saves the new cards into the database
                     exportCards(parsedData).then(() => {
+                        // Creates the new deck
                         createDeck().then((createdDeck) => {
                             if (createdDeck) {
                                 const cardLinks: Tables<'card_in_deck'>[] = [];
@@ -151,7 +164,9 @@ export const useImportDeckDialogVM = () => {
                                 })
 
                                 console.log(cardLinks);
+                                // Adds the cards into the deck
                                 linkCards(cardLinks).then(() => {
+                                    // Uploads the deck image
                                     handleUploadDeckImage(createdDeck.id).then((success) => {
                                         if (success || !deckImage) {
                                             console.log("Import complete")
@@ -161,12 +176,21 @@ export const useImportDeckDialogVM = () => {
                                         }
                                     }).catch(() => alert("The deck image couldn't be uploaded..."))
                                         .finally(() => setImportDialogOpen(false))
-                                }).catch(() => alert("Sa roto en el peor momento posible, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: FCKFCK"));
+
+                                }).catch(() => {
+                                    handleDeckRollback(createdDeck.id)
+                                        .then(() => alert("Sa roto en el peor momento posible, disele a Tontonio e intenta de nuevo, Codigo de error: FCKFCK"));
+                                });
                             }
-                        }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: DIKSAD"));
-                    }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, (por si acaso revisa que las cartas del deck no tengan un diseño alternativo) Codigo de error: JWEXPL"));
-                }).catch(() => alert("Sa roto, disele a Tontonio para que limpie e intenta de nuevo, Codigo de error: INMIGR"));
-            }).catch(() => alert("Sa roto, intenta de nuevo o disele a Tontonio, Codigo de error: PNIGGE"));
+
+                        }).catch(() => alert("Sa roto, disele a Tontonio o intenta de nuevo, Codigo de error: DIKSAD"));
+
+                    }).catch(() => alert("Sa roto, disele a Tontonio e intenta de nuevo, (por si acaso revisa que las cartas del deck no tengan un diseño alternativo) Codigo de error: CARJEW"));
+
+                }).catch(() => alert("Sa roto, revisa que las cartas del deck no tengan un diseño alternativo o prueba a importarlo en yugiohprodeck, Codigo de error: CARINM"));
+
+            }).catch(() => alert("Sa roto, intenta de nuevo o disele a Tontonio, Codigo de error: YDKNGR"));
+
         } catch (err) {
             console.log("Import error: " + err);
             alert("Algo ha salido mal, revisa la url usada (pruebala el yugioh prodeck o algo) o habla con Tontonio.");

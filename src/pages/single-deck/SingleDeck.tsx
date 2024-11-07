@@ -4,6 +4,8 @@ import { useClient } from "../../client/useClient";
 import { Enums, Tables } from "../../database.types";
 import { useNavigate } from "react-router-dom";
 import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
+import { DeleteDeckDialog } from "./delete_dialog/DeleteDeckDialog";
+import { YDKEGenerateDialog } from "./ydke_generate_dialog/YDKEGenerateDialog";
 
 interface IDeckContent {
     cardId: number;
@@ -114,9 +116,21 @@ export const SingleDeck = () => {
                 <Grid item xs={12} sm={9}>
                     <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
                 </Grid>
-                {authorData?.authorId == currentUserId &&
-                    <Grid item xs={12} sm={3} display="flex" justifyContent={{ xs: 'flex-start', sm: "flex-end" }} my={2}>
-                        <EditDeckDialog />
+                {authorData?.authorId === currentUserId ?
+                    <Grid item container xs={12} md={3} display="flex" justifyContent={{ xs: 'flex-start', md: "flex-end" }} my={2} columnSpacing={1}>
+                        <Grid item>
+                            <YDKEGenerateDialog />
+                        </Grid>
+                        <Grid item>
+                            <EditDeckDialog />
+                        </Grid>
+                        <Grid item>
+                            <DeleteDeckDialog />
+                        </Grid>
+                    </Grid>
+                    :
+                    <Grid item container xs={12} sm={3} display="flex" justifyContent={{ xs: 'flex-start', sm: "flex-end" }} my={2}>
+                        <YDKEGenerateDialog />
                     </Grid>
                 }
             </Grid>

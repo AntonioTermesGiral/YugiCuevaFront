@@ -1,5 +1,6 @@
 import { Button, Dialog, Grid, styled, TextField, Typography } from "@mui/material";
 import { useEditDeckDialogVM } from "./useEditDeckDialogVM";
+import EditIcon from '@mui/icons-material/Edit';
 
 export const EditDeckDialog = () => {
     const {
@@ -28,7 +29,7 @@ export const EditDeckDialog = () => {
                     height: "50px",
                     fontSize: "2em",
                     backgroundColor: "darkgray"
-                }}>&#9998;</Button>
+                }}><EditIcon /></Button>
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} PaperProps={{ sx: { padding: 4 } }}>
                 <Grid container>
                     <Grid item xs={12}>
@@ -76,8 +77,9 @@ export const EditDeckDialog = () => {
                             />
                         </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <Button onClick={handleUpdateDeck}>Apply</Button>
+                    <Grid item container justifyContent="space-between" mt={2}>
+                        <Button color="inherit" onClick={() => setEditDialogOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleUpdateDeck}>Aplicar</Button>
                     </Grid>
                 </Grid>
             </Dialog>
