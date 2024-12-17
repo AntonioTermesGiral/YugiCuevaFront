@@ -1,4 +1,4 @@
-import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid, Menu, MenuItem } from "@mui/material"
+import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserRoute } from "../utils/getUserRoute";
@@ -9,10 +9,6 @@ export const YGCDesktopToolbar = () => {
     const navigate = useNavigate();
 
     const [searchBarValue, setSearchBarValue] = useState("");
-    const [tierlistMenuAnchor, setTierlistMenuAnchor] = useState<null | HTMLElement>(null);
-    const tierlistMenuOpen = Boolean(tierlistMenuAnchor);
-    const handleOpenTierlistMenu = (event: React.MouseEvent<HTMLElement>) => setTierlistMenuAnchor(event.currentTarget);
-    const handleCloseTierlistMenu = () => setTierlistMenuAnchor(null);
     const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
 
     const handleSearchSubmit = () => {
@@ -49,15 +45,9 @@ export const YGCDesktopToolbar = () => {
                                 onClick={() => navigate(getUserRoute())}
                             />
                             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={handleOpenTierlistMenu}>Tierlist</Button>
-                            <Menu anchorEl={tierlistMenuAnchor} open={tierlistMenuOpen} onClose={handleCloseTierlistMenu}>
-                                <MenuItem onClick={() => { navigate("/tierlists/meta"); handleCloseTierlistMenu(); }}>Meta Tierlist</MenuItem>
-                                <MenuItem onClick={() => { navigate("/tierlists/chill"); handleCloseTierlistMenu(); }}>Chill Tierlist</MenuItem>
-                            </Menu>
+                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/tierlists/meta")}>Tierlist</Button>
                             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/matches")}>Matches</Button>
-                            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/polls")}>Polls</Button>
+                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/duels")}>Duels</Button>
                         </Grid>
                         <Grid item xs={4}>
                             <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}>

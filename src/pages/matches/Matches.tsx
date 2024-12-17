@@ -1,18 +1,20 @@
-import { Card, Grid, Typography } from "@mui/material"
+import { Grid, Typography } from "@mui/material"
 import { useClient } from "../../client/useClient";
 import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
-import { WipScreen } from "../../components/WipScreen";
+import { MatchCard } from "./MatchCard";
+import { CreateMatchDialog } from "./create_dialog/CreateMatchDialog";
 
 interface IPlayerData {
     playerId: string | null,
     playerDisplayName: string | null,
     playerDeckId: string | null,
     playerDeckName: string | null,
-    pointChanges: string
+    pointChanges: string,
+    deckImage: string
 }
 
-interface IMatch {
+export interface IMatch {
     id: string,
     date: string,
     type: Enums<'MatchType'> | null,
@@ -26,6 +28,9 @@ interface IMatch {
 export const Matches = () => {
     const { getInstance } = useClient();
     const [matches, setMatches] = useState<IMatch[]>([]);
+
+    // const theme = useTheme();
+    // const matchesMD = useMediaQuery(theme.breakpoints.up('md'))
 
     // TODO: pagination
     const loadData = async (): Promise<IMatch[]> => {
@@ -55,12 +60,12 @@ export const Matches = () => {
 
             const idsToSearch = ids_to_search.map((sid) => sid.match_id);
 
-            matchesObj = await supabase.from('match').select().in('id', idsToSearch);
+            matchesObj = await supabase.from('match').select().in('id', idsToSearch).order('date', { ascending: false });
             matchesDataObj = await supabase.from('match_data').select().in('match_id', idsToSearch);
 
         } else {
             // LASTEST MATCHES
-            matchesObj = await supabase.from('match').select().limit(10);
+            matchesObj = await supabase.from('match').select().limit(10).order('date', { ascending: false });
             matchesDataObj = await supabase.from('match_data').select();
         }
 
@@ -110,7 +115,8 @@ export const Matches = () => {
                     playerDeckName: matchesDecks.get(cmd.deck ?? "") ?? null,
                     playerId: cmd.player,
                     playerDisplayName: matchesPlayers.get(cmd.player ?? "") ?? null,
-                    pointChanges: cmd.deck_point_changes ?? "0"
+                    pointChanges: cmd.deck_point_changes ?? "0",
+                    deckImage: import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + cmd.deck + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT// + "?ver=" + new Date().getTime()
                 }
 
                 if (cmd.winner) {
@@ -139,32 +145,21 @@ export const Matches = () => {
 
     }
 
-    useEffect(() => {
+    const handleLoad = () => {
         loadData().then((matchesData) => {
             console.log(matchesData);
             setMatches(matchesData);
         });
-    }, [])
+    }
+    useEffect(handleLoad, [])
 
     return (
         <Grid container p={2}>
-            <Typography variant="h3">Matches</Typography>
+            <Typography variant="h3" mr={2}>Duels</Typography>
+            <CreateMatchDialog refreshData={handleLoad} />
             <Grid container>
-                {matches.map((match) => {
-                    return (
-                        <Grid item key={match.id}>
-                            <Card sx={{ p: 2, m: 2, textAlign: "center" }}>
-                                <div>{new Date(match.date).toLocaleDateString()}</div>
-                                <div>{match.type}</div>
-                                <div>{match.winners[0].playerDisplayName + ` (${match.winners[0].pointChanges})`} - {match.losers[0].playerDisplayName + ` (${match.losers[0].pointChanges})`}</div>
-                                <div>{match.winners[0].playerDeckName} - {match.losers[0].playerDeckName}</div>
-                                <div>{match.winnersScore} - {match.losersScore}</div>
-                            </Card>
-                        </Grid>
-                    )
-                })}
+                {matches.map((match) => <MatchCard key={match.id} match={match} />)}
             </Grid>
-            <WipScreen/>
         </Grid>
     )
 }

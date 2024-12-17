@@ -35,7 +35,7 @@ const routes: RouteObject[] = [
         element: <TierList variant="CHILL" />,
     },
     {
-        path: "/matches",
+        path: "/duels",
         element: <Matches />,
     },
     { // TODO: To be implemented

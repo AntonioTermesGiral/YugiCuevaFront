@@ -17,7 +17,7 @@ interface IProfileResponse {
 }
 
 export const Profile = () => {
-    type TABS = "DECKS" | "MATCHES";
+    type TABS = "DECKS" | "DUELS";
     const navigate = useNavigate();
     const { getInstance } = useClient();
     const loc = useLocation();
@@ -112,7 +112,7 @@ export const Profile = () => {
                     <Grid item xs={12} sm={5} display="flex" justifyContent={{ xs: "center", sm: "flex-end" }}>
                         <Tabs value={selectedTab} onChange={(_e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
                             <Tab label="Decks" value="DECKS" />
-                            <Tab label="Matches" value="MATCHES" />
+                            <Tab label="Matches" value="DUELS" />
                         </Tabs>
                     </Grid>
                 </Grid>
@@ -131,7 +131,7 @@ export const Profile = () => {
                     </Grid>
                     :
                     <Grid>
-                        <Typography>MATCHES</Typography>
+                        <Typography>DUELS</Typography>
                         <WipScreen />
                     </Grid>
                 }

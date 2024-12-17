@@ -31,3 +31,6 @@ export interface IYGOPDCard {
     archetype: string | undefined,
     linkval: number | undefined
 }
+
+type AutocompleteKeyType = { key: string };
+export type GenericAutocompleteItemType = React.HTMLAttributes<HTMLLIElement> & AutocompleteKeyType;

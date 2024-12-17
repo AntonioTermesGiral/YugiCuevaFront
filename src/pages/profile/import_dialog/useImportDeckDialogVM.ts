@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { useClient } from "../../../client/useClient";
 import { IYGOPDCard } from "../../../constants/types";
-import { Enums, Tables } from "../../../database.types";
+import { Tables } from "../../../database.types";
 import { parseURL } from "../../../utils/ydke";
 import Resizer from "react-image-file-resizer";
 import { LS_USER_DATA_KEY } from "../../../constants/keys";
@@ -11,9 +11,21 @@ export const useImportDeckDialogVM = () => {
     const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [deckName, setDeckName] = useState("");
     const [ydkeURL, setydkeURL] = useState("");
-    const [deckTierlist, setDeckTierlist] = useState<Enums<"Tierlist">>();
     const [deckTier, setDeckTier] = useState<number>();
     const [deckImage, setDeckImage] = useState<File>();
+
+    const getInitialPoints = (tier?: number) => {
+        switch (tier) {
+            case 0: return 325;
+            case 1: return 275;
+            case 2: return 225;
+            case 3: return 175;
+            case 4: return 125;
+            case 5: return 75;
+            case 6: return 25;
+            default: return 0;
+        }
+    }
 
     const countCodes = (codes: number[]) => {
         const res = new Map<number, number>;
@@ -63,8 +75,8 @@ export const useImportDeckDialogVM = () => {
                 name: deckName,
                 owner: userId,
                 tier: deckTier,
-                tierlist: deckTierlist,
-                points: 0
+                tierlist: "META",
+                points: getInitialPoints(deckTier)
             } as Tables<'deck'>).select();
 
             console.log(data, error);
@@ -252,8 +264,6 @@ export const useImportDeckDialogVM = () => {
         setDeckName,
         ydkeURL,
         setydkeURL,
-        deckTierlist,
-        setDeckTierlist,
         deckTier,
         setDeckTier,
         handleUploadDeck,
