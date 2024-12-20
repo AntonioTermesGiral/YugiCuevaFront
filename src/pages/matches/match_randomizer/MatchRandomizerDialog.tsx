@@ -18,7 +18,7 @@ export const MatchRandomizerDialog = () => {
     const [pairs, setPairs] = useState<IPair[]>([]);
 
     const getMatchup = () => {
-        if (tier) {
+        if (tier !== undefined) {
             const supabase = getInstance();
             const vals = new Map<Tables<"profile">, Tables<"deck">[]>();
             // Get decks
