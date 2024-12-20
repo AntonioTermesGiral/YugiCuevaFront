@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
 import { MatchCard } from "./MatchCard";
 import { CreateMatchDialog } from "./create_dialog/CreateMatchDialog";
+import { MatchRandomizerDialog } from "./match_randomizer/MatchRandomizerDialog";
 
 interface IPlayerData {
     playerId: string | null,
@@ -157,6 +158,9 @@ export const Matches = () => {
         <Grid container p={2}>
             <Typography variant="h3" mr={2}>Duels</Typography>
             <CreateMatchDialog refreshData={handleLoad} />
+            <Grid ml={1}>
+                <MatchRandomizerDialog />
+            </Grid>
             <Grid container>
                 {matches.map((match) => <MatchCard key={match.id} match={match} />)}
             </Grid>
