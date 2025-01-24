@@ -71,7 +71,7 @@ export const DeckCard = ({ deck, hideTierInfo, hideOwnerInfo }: IDeckCard) => {
                             Tier: {deck.tier ?? "?"}
                         </Typography>}
                         <Typography variant="body2" color="text.secondary">
-                            Points(WIP): {deck.points ?? 0}
+                            Points: {deck.points ?? 0}
                         </Typography>
                     </Grid>
                     <IconButton

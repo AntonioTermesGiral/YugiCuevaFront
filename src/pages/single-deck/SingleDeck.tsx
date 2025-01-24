@@ -2,10 +2,13 @@ import { Grid, GridProps, Typography, useMediaQuery, useTheme } from "@mui/mater
 import { useEffect, useState } from "react";
 import { useClient } from "../../client/useClient";
 import { Enums, Tables } from "../../database.types";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
 import { DeleteDeckDialog } from "./delete_dialog/DeleteDeckDialog";
 import { YDKEGenerateDialog } from "./ydke_generate_dialog/YDKEGenerateDialog";
+import { buildMatchData, fetchMatchDataByDeck } from "../matches/data-load/match_data_loaders";
+import { IMatch } from "../matches/data-load/match_data_interfaces";
+import { MatchCard } from "../matches/MatchCard";
 
 interface IDeckContent {
     cardId: number;
@@ -18,6 +21,7 @@ interface IDeckScreenData {
     deckContents: IDeckContent[];
     deckData: Tables<'deck'>;
     authorData: IDeckAuthorData;
+    matches: IMatch[]
 }
 
 interface IDeckAuthorData {
@@ -28,12 +32,14 @@ interface IDeckAuthorData {
 export const SingleDeck = () => {
     const { getInstance } = useClient();
     const navigate = useNavigate();
+    const { search } = useLocation();
     const { cardsContainerStyles, cardProperties } = singleDeckStyles();
     const [currentUserId, setCurrentUserId] = useState<string>();
 
     const [deckData, setDeckData] = useState<Tables<'deck'>>();
     const [content, setContent] = useState<IDeckContent[]>([]);
     const [authorData, setAuthorData] = useState<IDeckAuthorData>();
+    const [matches, setMatches] = useState<IMatch[]>([]);
 
     const theme = useTheme();
     const matchesMD = useMediaQuery(theme.breakpoints.up('sm'));
@@ -61,6 +67,12 @@ export const SingleDeck = () => {
             const { data: authorDN, error: authorError } = await supabase.from('profile').select('id,display_name').eq("id", deckData[0].owner);
             authorError && console.error(authorError);
 
+            // Matches by deck
+            const { matchesObj, matchesDataObj } = await fetchMatchDataByDeck(supabase, deckID);
+            matchesObj.error && console.log(matchesObj.error);
+            matchesDataObj.error && console.log(matchesDataObj.error);
+            const matchesData = await buildMatchData(supabase, { matchesObj, matchesDataObj });
+
             const dContent = linksData.map((link: Tables<'card_in_deck'>) => {
                 return {
                     cardId: link.card_id,
@@ -76,7 +88,8 @@ export const SingleDeck = () => {
                 authorData: {
                     authorDisplayName: authorDN[0].display_name,
                     authorId: authorDN[0].id
-                }
+                },
+                matches: matchesData
             }
         }
 
@@ -89,8 +102,9 @@ export const SingleDeck = () => {
             setContent(res?.deckContents ?? []);
             setDeckData(res?.deckData);
             setAuthorData(res?.authorData);
+            setMatches(res?.matches ?? []);
         });
-    }, []);
+    }, [search]);
 
     const getCardSizes = () => {
         if (matchesLG) return { height: 156.4, width: 107.2 };
@@ -156,6 +170,12 @@ export const SingleDeck = () => {
                 ))}
             </Grid>
         </Grid >
+        {matches.length > 0 && <Grid container mt={2}>
+            <Typography ml={2} variant="h5">DUELS</Typography>
+            <Grid container>
+                {matches.map((match) => <MatchCard key={match.id} match={match} />)}
+            </Grid>
+        </Grid>}
     </Grid>;
 };
 

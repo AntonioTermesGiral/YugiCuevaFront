@@ -1,30 +1,11 @@
 import { Grid, Typography } from "@mui/material"
 import { useClient } from "../../client/useClient";
 import { useEffect, useState } from "react";
-import { Enums, Tables } from "../../database.types";
 import { MatchCard } from "./MatchCard";
 import { CreateMatchDialog } from "./create_dialog/CreateMatchDialog";
 import { MatchRandomizerDialog } from "./match_randomizer/MatchRandomizerDialog";
-
-interface IPlayerData {
-    playerId: string | null,
-    playerDisplayName: string | null,
-    playerDeckId: string | null,
-    playerDeckName: string | null,
-    pointChanges: string,
-    deckImage: string
-}
-
-export interface IMatch {
-    id: string,
-    date: string,
-    type: Enums<'MatchType'> | null,
-    sideDeck: boolean,
-    winners: IPlayerData[],
-    losers: IPlayerData[],
-    winnersScore: number,
-    losersScore: number
-}
+import { DEF_RAW_MATCH, IMatch, IRawMatchesData } from "./data-load/match_data_interfaces";
+import { buildMatchData, fetchMatchData, fetchMatchDataByDeck, fetchMatchDataByUser } from "./data-load/match_data_loaders";
 
 export const Matches = () => {
     const { getInstance } = useClient();
@@ -40,110 +21,31 @@ export const Matches = () => {
         const deckInMatch = url.searchParams.get("deck");
         const userInMatch = url.searchParams.get("user");
 
-        let matchesObj = { data: [], error: null };
-        let matchesDataObj = { data: [], error: null };
-
-        if (deckInMatch || userInMatch) {
-            let ids_to_search: { match_id: string }[] = [];
-
-            if (deckInMatch) {
-                // MATCHES BY DECK
-                const { data: searchIds, error: searchIdsError } = await supabase.from('match_data').select('match_id').eq('deck', deckInMatch);
-                searchIdsError && console.log(searchIdsError);
-                ids_to_search = searchIds;
-
-            } else if (userInMatch) {
-                // MATCHES BY USER
-                const { data: searchIds, error: searchIdsError } = await supabase.from('match_data').select('match_id').eq('player', userInMatch);
-                searchIdsError && console.log(searchIdsError);
-                ids_to_search = searchIds;
+        const rawData: IRawMatchesData = { matchesObj: DEF_RAW_MATCH, matchesDataObj: DEF_RAW_MATCH }
+        switch (true) {
+            case deckInMatch !== null: {
+                const deckMatchesData = await fetchMatchDataByDeck(supabase, deckInMatch);
+                rawData.matchesObj = deckMatchesData.matchesObj;
+                rawData.matchesDataObj = deckMatchesData.matchesDataObj;
+                break;
             }
-
-            const idsToSearch = ids_to_search.map((sid) => sid.match_id);
-
-            matchesObj = await supabase.from('match').select().in('id', idsToSearch).order('date', { ascending: false });
-            matchesDataObj = await supabase.from('match_data').select().in('match_id', idsToSearch);
-
-        } else {
-            // LASTEST MATCHES
-            matchesObj = await supabase.from('match').select().limit(10).order('date', { ascending: false });
-            matchesDataObj = await supabase.from('match_data').select();
+            case userInMatch !== null: {
+                const userMatchesData = await fetchMatchDataByUser(supabase, userInMatch);
+                rawData.matchesObj = userMatchesData.matchesObj;
+                rawData.matchesDataObj = userMatchesData.matchesDataObj;
+                break;
+            }
+            default: {
+                const defaultMatchesData = await fetchMatchData(supabase);
+                rawData.matchesObj = defaultMatchesData.matchesObj;
+                rawData.matchesDataObj = defaultMatchesData.matchesDataObj;
+            }
         }
 
-        matchesObj.error && console.log(matchesObj.error);
+        rawData.matchesObj.error && console.log(rawData.matchesObj.error);
+        rawData.matchesDataObj.error && console.log(rawData.matchesDataObj.error);
 
-        matchesDataObj.error && console.log(matchesDataObj.error);
-
-        // Decks search
-        const decksIds = [...(new Set((matchesDataObj.data as Tables<'match_data'>[]).map((mdo) => mdo.deck)))];
-
-        const { data: matchesDecksData, error: matchesDecksError } = await supabase.from('deck').select().in('id', decksIds);
-        matchesDecksError && console.log(matchesDecksError);
-
-        const matchesDecks = new Map<string, string>();
-        (matchesDecksData as Tables<'deck'>[]).forEach((d) => {
-            matchesDecks.set(d.id, d.name);
-        });
-
-        // Players search
-        const playersIds = [...(new Set((matchesDataObj.data as Tables<'match_data'>[]).map((mdo) => mdo.player)))];
-
-        const { data: matchesPlayersData, error: matchesPlayersError } = await supabase.from('profile').select().in('id', playersIds);
-        matchesPlayersError && console.log(matchesPlayersError);
-
-        const matchesPlayers = new Map<string, string>();
-        (matchesPlayersData as Tables<'profile'>[]).forEach((d) => {
-            matchesPlayers.set(d.id, d.display_name);
-        });
-
-        // Builds the results
-        const matchesRes: IMatch[] = [];
-
-        (matchesObj.data as Tables<'match'>[]).forEach((match) => {
-
-            const currentMatchData = (matchesDataObj.data as Tables<'match_data'>[])
-                .filter((cmdo) => cmdo.match_id == match.id);
-
-            let currentWinnersScore;
-            let currentLosersScore;
-
-            const currentWinners: IPlayerData[] = [];
-            const currentLosers: IPlayerData[] = [];
-
-            currentMatchData.forEach((cmd) => {
-                const currentPlayer: IPlayerData = {
-                    playerDeckId: cmd.deck,
-                    playerDeckName: matchesDecks.get(cmd.deck ?? "") ?? null,
-                    playerId: cmd.player,
-                    playerDisplayName: matchesPlayers.get(cmd.player ?? "") ?? null,
-                    pointChanges: cmd.deck_point_changes ?? "0",
-                    deckImage: import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + cmd.deck + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT// + "?ver=" + new Date().getTime()
-                }
-
-                if (cmd.winner) {
-                    currentWinnersScore = cmd.score;
-                    currentWinners.push(currentPlayer);
-                } else {
-                    currentLosersScore = cmd.score;
-                    currentLosers.push(currentPlayer);
-                }
-
-            });
-
-            matchesRes.push({
-                id: match.id,
-                date: match.date,
-                type: match.type,
-                sideDeck: match.side_deck ?? false,
-                losers: currentLosers,
-                losersScore: currentLosersScore ?? 0,
-                winners: currentWinners,
-                winnersScore: currentWinnersScore ?? 0
-            })
-        });
-
-        return matchesRes;
-
+        return buildMatchData(supabase, rawData);
     }
 
     const handleLoad = () => {

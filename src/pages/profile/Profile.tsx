@@ -5,15 +5,18 @@ import { ImportDeckDialog } from "./import_dialog/ImportDeckDialog";
 import { Tables } from "../../database.types";
 import { DeckCard } from "../../components/DeckCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import { WipScreen } from "../../components/WipScreen";
 import { DARK_BLUE } from "../../constants/colors";
 import { EditProfileDialog } from "./edit_dialog/EditProfileDialog";
 import { LS_USER_DATA_KEY } from "../../constants/keys";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { buildMatchData, fetchMatchDataByUser } from "../matches/data-load/match_data_loaders";
+import { IMatch } from "../matches/data-load/match_data_interfaces";
+import { MatchCard } from "../matches/MatchCard";
 
 interface IProfileResponse {
     profile: Tables<'profile'>;
     decks: Tables<'deck'>[];
+    matches: IMatch[]
 }
 
 export const Profile = () => {
@@ -23,8 +26,7 @@ export const Profile = () => {
     const loc = useLocation();
     const [user, setUser] = useState<Tables<'profile'>>();
     const [decks, setDecks] = useState<Tables<'deck'>[]>([]);
-    // TODO: Matches implementation on profile
-    // const [matches, setMatches] = useState<Tables<'match'>[]>([]);
+    const [matches, setMatches] = useState<IMatch[]>([]);
     const [selectedTab, setSelectedTab] = useState<TABS>("DECKS");
     const [isCurrentUser, setIsCurrentUser] = useState(false);
 
@@ -45,8 +47,14 @@ export const Profile = () => {
             const { data: decks, error: deckError } = await supabase.from('deck').select().eq('owner', profile[0].id);
             deckError && console.log(decks, deckError);
 
+            // Get matches
+            const { matchesObj, matchesDataObj } = await fetchMatchDataByUser(supabase, profile[0].id);
+            matchesObj.error && console.log(matchesObj.error);
+            matchesDataObj.error && console.log(matchesDataObj.error);
+            const matchesData = await buildMatchData(supabase, { matchesObj, matchesDataObj });
+
             // Return
-            return { profile: profile[0], decks: decks };
+            return { profile: profile[0], decks: decks, matches: matchesData };
         }
         return undefined;
     }
@@ -66,6 +74,7 @@ export const Profile = () => {
         getUserData().then((res) => {
             setUser(res?.profile);
             setDecks(res?.decks ?? []);
+            setMatches(res?.matches ?? [])
         })
     }, [loc.search])
 
@@ -100,7 +109,7 @@ export const Profile = () => {
                             backgroundColor: "darkred",
                             minWidth: "auto",
                             paddingBottom: "0px"
-                        }}><LogoutIcon/></Button>}
+                        }}><LogoutIcon /></Button>}
                 </Grid>
                 <Grid item container xs={12} md={9} lg={10} alignItems="end">
                     <Grid item xs={12} sm={7} >
@@ -112,7 +121,7 @@ export const Profile = () => {
                     <Grid item xs={12} sm={5} display="flex" justifyContent={{ xs: "center", sm: "flex-end" }}>
                         <Tabs value={selectedTab} onChange={(_e, val) => setSelectedTab(val)} aria-label="basic tabs example" textColor="inherit" sx={{ ".MuiTabs-indicator": { backgroundColor: "white" } }}>
                             <Tab label="Decks" value="DECKS" />
-                            <Tab label="Matches" value="DUELS" />
+                            <Tab label="Duels" value="DUELS" />
                         </Tabs>
                     </Grid>
                 </Grid>
@@ -130,9 +139,8 @@ export const Profile = () => {
                         </Grid>
                     </Grid>
                     :
-                    <Grid>
-                        <Typography>DUELS</Typography>
-                        <WipScreen />
+                    <Grid container>
+                        {matches.map((match) => <MatchCard key={match.id} match={match} />)}
                     </Grid>
                 }
             </Grid>
