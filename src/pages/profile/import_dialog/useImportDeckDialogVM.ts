@@ -1,10 +1,10 @@
 import { ChangeEvent, useState } from "react";
 import { useClient } from "../../../client/useClient";
-import { IYGOPDCard } from "../../../constants/types";
 import { Tables } from "../../../database.types";
 import { parseURL } from "../../../utils/ydke";
 import Resizer from "react-image-file-resizer";
 import { LS_USER_DATA_KEY } from "../../../constants/keys";
+import { countCodes, exportCards, getCardsInDBByIds, importCards, linkCards } from "../../../utils/ydke-import-helper";
 
 export const useImportDeckDialogVM = () => {
     const { getInstance } = useClient();
@@ -27,46 +27,7 @@ export const useImportDeckDialogVM = () => {
         }
     }
 
-    const countCodes = (codes: number[]) => {
-        const res = new Map<number, number>;
-        codes.forEach((code) => {
-            const currentQuantity = res.get(code);
-            res.set(code, (currentQuantity ?? 0) + 1);
-        })
-
-        return res;
-    };
-
-    const importCards = async (cardList: number[]): Promise<IYGOPDCard[]> => {
-        if (cardList.length > 0) {
-            const mainRequestString = cardList.join(",");
-            console.log(mainRequestString);
-
-            const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?id=' + mainRequestString).then(res => res.text());
-            return JSON.parse(res).data;
-        }
-
-        return [];
-    }
-
-    const exportCards = async (cards: Tables<'card'>[]) => {
-        if (cards.length > 0) {
-            const supabase = getInstance();
-            const { data, error } = await supabase.from('card').insert(cards).select();
-            console.log(data, error);
-            if (error) throw new Error("No se ha podido exportar")
-        }
-    }
-
-    const getCardsInDBByIds = async (ids: number[]): Promise<number[]> => {
-        const supabase = getInstance();
-        const { data, error } = await supabase.from('card').select('id').in('id', ids);
-        console.log(data, error);
-        return (data as Tables<'card'>[]).map(c => c.id) ?? [];
-    }
-
     const createDeck = async () => {
-
         const supastorage = localStorage.getItem(LS_USER_DATA_KEY);
         if (supastorage) {
             const supabase = getInstance();
@@ -85,11 +46,7 @@ export const useImportDeckDialogVM = () => {
         return undefined;
     }
 
-    const linkCards = async (cardsData: Tables<'card_in_deck'>[]) => {
-        const supabase = getInstance();
-        const { data, error } = await supabase.from('card_in_deck').insert(cardsData).select();
-        console.log(data, error);
-    }
+
 
     const handleDeckRollback = async (deckId: string) => {
         const supabase = getInstance();
@@ -107,6 +64,7 @@ export const useImportDeckDialogVM = () => {
         }
 
         try {
+            const supabase = getInstance();
             const deckCodes = parseURL(ydkeURL);
             const mainCodes = [...deckCodes.main];
             const extraCodes = [...deckCodes.extra];
@@ -120,7 +78,7 @@ export const useImportDeckDialogVM = () => {
             const uniqueCards = [...new Set([...mainCodes, ...extraCodes, ...sideCodes])];
 
             // Searches the cards in the db
-            getCardsInDBByIds(uniqueCards).then((cardsInDB) => {
+            getCardsInDBByIds(uniqueCards, supabase).then((cardsInDB) => {
                 const cardsNOTInDB = uniqueCards.filter((card) => !cardsInDB.includes(card));
                 // Gets the non existing cards from the ygoprodeck api
                 importCards(cardsNOTInDB).then((res) => {
@@ -143,7 +101,7 @@ export const useImportDeckDialogVM = () => {
                     });
                     console.log(parsedData);
                     // Saves the new cards into the database
-                    exportCards(parsedData).then(() => {
+                    exportCards(parsedData, supabase).then(() => {
                         // Creates the new deck
                         createDeck().then((createdDeck) => {
                             if (createdDeck) {
@@ -177,7 +135,7 @@ export const useImportDeckDialogVM = () => {
 
                                 console.log(cardLinks);
                                 // Adds the cards into the deck
-                                linkCards(cardLinks).then(() => {
+                                linkCards(cardLinks, supabase).then(() => {
                                     // Uploads the deck image
                                     handleUploadDeckImage(createdDeck.id).then((success) => {
                                         if (success || !deckImage) {

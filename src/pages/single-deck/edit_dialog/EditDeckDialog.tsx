@@ -8,6 +8,8 @@ export const EditDeckDialog = () => {
         setEditDialogOpen,
         deckName,
         setDeckName,
+        ydkeURL,
+        setydkeURL,
         handleUpdateDeck,
         onChangeDeckImage,
         originalDeckPictureUrl
@@ -43,6 +45,9 @@ export const EditDeckDialog = () => {
                             value={deckName}
                             onChange={(e) => setDeckName(e.target.value)}
                         />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField fullWidth sx={{ my: 1 }} label="NEW ydke url (dejar vacio si no la quieres cambiar)" value={ydkeURL} onChange={(e) => setydkeURL(e.target.value)} />
                     </Grid>
                     <Grid item container justifyContent="space-between">
                         <Grid item xs={12} sm={5.5}>
