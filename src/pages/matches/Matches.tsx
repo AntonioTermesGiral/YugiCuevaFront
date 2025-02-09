@@ -4,48 +4,23 @@ import { useEffect, useState } from "react";
 import { MatchCard } from "./MatchCard";
 import { CreateMatchDialog } from "./create_dialog/CreateMatchDialog";
 import { MatchRandomizerDialog } from "./match_randomizer/MatchRandomizerDialog";
-import { DEF_RAW_MATCH, IMatch, IRawMatchesData } from "./data-load/match_data_interfaces";
-import { buildMatchData, fetchMatchData, fetchMatchDataByDeck, fetchMatchDataByUser } from "./data-load/match_data_loaders";
+import { IMatch } from "./data-load/match_data_interfaces";
+import { buildMatchData, fetchMatchData } from "./data-load/match_data_loaders";
 
 export const Matches = () => {
     const { getInstance } = useClient();
     const [matches, setMatches] = useState<IMatch[]>([]);
 
-    // const theme = useTheme();
-    // const matchesMD = useMediaQuery(theme.breakpoints.up('md'))
-
     // TODO: pagination
     const loadData = async (): Promise<IMatch[]> => {
         const supabase = getInstance();
-        const url = new URL(location.href);
-        const deckInMatch = url.searchParams.get("deck");
-        const userInMatch = url.searchParams.get("user");
 
-        const rawData: IRawMatchesData = { matchesObj: DEF_RAW_MATCH, matchesDataObj: DEF_RAW_MATCH }
-        switch (true) {
-            case deckInMatch !== null: {
-                const deckMatchesData = await fetchMatchDataByDeck(supabase, deckInMatch);
-                rawData.matchesObj = deckMatchesData.matchesObj;
-                rawData.matchesDataObj = deckMatchesData.matchesDataObj;
-                break;
-            }
-            case userInMatch !== null: {
-                const userMatchesData = await fetchMatchDataByUser(supabase, userInMatch);
-                rawData.matchesObj = userMatchesData.matchesObj;
-                rawData.matchesDataObj = userMatchesData.matchesDataObj;
-                break;
-            }
-            default: {
-                const defaultMatchesData = await fetchMatchData(supabase);
-                rawData.matchesObj = defaultMatchesData.matchesObj;
-                rawData.matchesDataObj = defaultMatchesData.matchesDataObj;
-            }
-        }
+        const { matchesObj, matchesDataObj } = await fetchMatchData(supabase);
 
-        rawData.matchesObj.error && console.log(rawData.matchesObj.error);
-        rawData.matchesDataObj.error && console.log(rawData.matchesDataObj.error);
+        matchesObj.error && console.log(matchesObj.error);
+        matchesDataObj.error && console.log(matchesDataObj.error);
 
-        return buildMatchData(supabase, rawData);
+        return buildMatchData(supabase, { matchesObj, matchesDataObj });
     }
 
     const handleLoad = () => {

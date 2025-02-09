@@ -1,110 +1,26 @@
-import { Grid, GridProps, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useClient } from "../../client/useClient";
-import { Enums, Tables } from "../../database.types";
-import { useLocation, useNavigate } from "react-router-dom";
+import { CircularProgress, Grid, GridProps, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
 import { DeleteDeckDialog } from "./delete_dialog/DeleteDeckDialog";
 import { YDKEGenerateDialog } from "./ydke_generate_dialog/YDKEGenerateDialog";
-import { buildMatchData, fetchMatchDataByDeck } from "../matches/data-load/match_data_loaders";
-import { IMatch } from "../matches/data-load/match_data_interfaces";
 import { MatchCard } from "../matches/MatchCard";
-
-interface IDeckContent {
-    cardId: number;
-    qty: number;
-    cardImage: string;
-    position?: Enums<'CardPosition'>;
-}
-
-interface IDeckScreenData {
-    deckContents: IDeckContent[];
-    deckData: Tables<'deck'>;
-    authorData: IDeckAuthorData;
-    matches: IMatch[]
-}
-
-interface IDeckAuthorData {
-    authorDisplayName: string;
-    authorId: string;
-}
+import { IDeckContent, useSingleDeckViewModel } from "./useSingleDeckViewModel";
 
 export const SingleDeck = () => {
-    const { getInstance } = useClient();
     const navigate = useNavigate();
-    const { search } = useLocation();
-    const { cardsContainerStyles, cardProperties } = singleDeckStyles();
-    const [currentUserId, setCurrentUserId] = useState<string>();
-
-    const [deckData, setDeckData] = useState<Tables<'deck'>>();
-    const [content, setContent] = useState<IDeckContent[]>([]);
-    const [authorData, setAuthorData] = useState<IDeckAuthorData>();
-    const [matches, setMatches] = useState<IMatch[]>([]);
+    const {
+        currentUserId,
+        deckData,
+        content,
+        authorData,
+        matches,
+        loading
+    } = useSingleDeckViewModel();
+    const { cardsContainerStyles, cardProperties, loaderProps } = singleDeckStyles();
 
     const theme = useTheme();
     const matchesMD = useMediaQuery(theme.breakpoints.up('sm'));
     const matchesLG = useMediaQuery(theme.breakpoints.up('md'));
-
-    const loadDeckData = async (): Promise<IDeckScreenData | undefined> => {
-        const url = new URL(location.href);
-        const deckID = url.searchParams.get("id");
-
-        if (deckID) {
-            const supabase = getInstance();
-
-            const { data: { user: currentUser } } = await supabase.auth.getUser()
-            setCurrentUserId(currentUser?.id);
-
-            // Deck search by id
-            const { data: deckData, error: deckError } = await supabase.from('deck').select().eq("id", deckID);
-            deckError && console.error(deckError);
-
-            // Links search by deck id
-            const { data: linksData, error: linksError } = await supabase.from('card_in_deck').select().eq("deck_id", deckID);
-            linksError && console.error(linksError);
-
-            // Author search by id
-            const { data: authorDN, error: authorError } = await supabase.from('profile').select('id,display_name').eq("id", deckData[0].owner);
-            authorError && console.error(authorError);
-
-            // Matches by deck
-            const { matchesObj, matchesDataObj } = await fetchMatchDataByDeck(supabase, deckID);
-            matchesObj.error && console.log(matchesObj.error);
-            matchesDataObj.error && console.log(matchesDataObj.error);
-            const matchesData = await buildMatchData(supabase, { matchesObj, matchesDataObj });
-
-            const dContent = linksData.map((link: Tables<'card_in_deck'>) => {
-                return {
-                    cardId: link.card_id,
-                    cardImage: import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + link.card_id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT + "?ver=" + new Date().getTime(),
-                    qty: link.quantity,
-                    position: link.position
-                } as IDeckContent;
-            });
-
-            return {
-                deckData: deckData[0],
-                deckContents: dContent,
-                authorData: {
-                    authorDisplayName: authorDN[0].display_name,
-                    authorId: authorDN[0].id
-                },
-                matches: matchesData
-            }
-        }
-
-        return undefined;
-
-    }
-
-    useEffect(() => {
-        loadDeckData().then((res) => {
-            setContent(res?.deckContents ?? []);
-            setDeckData(res?.deckData);
-            setAuthorData(res?.authorData);
-            setMatches(res?.matches ?? []);
-        });
-    }, [search]);
 
     const getCardSizes = () => {
         if (matchesLG) return { height: 156.4, width: 107.2 };
@@ -124,59 +40,64 @@ export const SingleDeck = () => {
             <img height={getCardSizes().height} width={getCardSizes().width} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
         </Grid>;
 
-    return <Grid container direction="column" px={2} mt={2}>
-        <Grid my={2}>
-            <Grid container>
-                <Grid item xs={12} sm={9}>
-                    <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
-                </Grid>
-                {authorData?.authorId === currentUserId ?
-                    <Grid item container xs={12} md={3} display="flex" justifyContent={{ xs: 'flex-start', md: "flex-end" }} my={2} columnSpacing={1}>
-                        <Grid item>
+    return <>
+        <Grid container direction="column" px={2} mt={2}>
+            <Grid my={2}>
+                <Grid container>
+                    <Grid item xs={12} sm={9}>
+                        <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
+                    </Grid>
+                    {authorData?.authorId === currentUserId ?
+                        <Grid item container xs={12} md={3} display="flex" justifyContent={{ xs: 'flex-start', md: "flex-end" }} my={2} columnSpacing={1}>
+                            <Grid item>
+                                <YDKEGenerateDialog />
+                            </Grid>
+                            <Grid item>
+                                <EditDeckDialog userImage={authorData?.image} />
+                            </Grid>
+                            <Grid item>
+                                <DeleteDeckDialog deckId={deckData?.id} deckImageId={deckData?.image} />
+                            </Grid>
+                        </Grid>
+                        :
+                        <Grid item container xs={12} sm={3} display="flex" justifyContent={{ xs: 'flex-start', sm: "flex-end" }} my={2}>
                             <YDKEGenerateDialog />
                         </Grid>
-                        <Grid item>
-                            <EditDeckDialog />
-                        </Grid>
-                        <Grid item>
-                            <DeleteDeckDialog />
-                        </Grid>
-                    </Grid>
-                    :
-                    <Grid item container xs={12} sm={3} display="flex" justifyContent={{ xs: 'flex-start', sm: "flex-end" }} my={2}>
-                        <YDKEGenerateDialog />
-                    </Grid>
+                    }
+                </Grid>
+                <Typography variant="h5" width="fit-content" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
+                {deckData?.tierlist &&
+                    <Typography variant="h5" width="fit-content" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
                 }
             </Grid>
-            <Typography variant="h5" width="fit-content" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
-            {deckData?.tierlist &&
-                <Typography variant="h5" width="fit-content" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
-            }
+            <Grid container direction="column" justifyContent="center">
+                <Grid {...cardsContainerStyles}>
+                    {content.filter((c) => c.position == "MAIN").map((card, i) => (
+                        <DeckCard card={card} i={i} key={card.cardId + i} />
+                    ))}
+                </Grid>
+                <Grid {...cardsContainerStyles}>
+                    {content.filter((c) => c.position == "EXTRA").map((card, i) => (
+                        <DeckCard card={card} i={i} key={card.cardId + i} />
+                    ))}
+                </Grid>
+                <Grid {...cardsContainerStyles}>
+                    {content.filter((c) => c.position == "SIDE").map((card, i) => (
+                        <DeckCard card={card} i={i} key={card.cardId + i} />
+                    ))}
+                </Grid>
+            </Grid >
+            {matches.length > 0 && <Grid container mt={2}>
+                <Typography ml={2} variant="h5">DUELS</Typography>
+                <Grid container>
+                    {matches.map((match) => <MatchCard key={match.id} match={match} />)}
+                </Grid>
+            </Grid>}
         </Grid>
-        <Grid container direction="column" justifyContent="center">
-            <Grid {...cardsContainerStyles}>
-                {content.filter((c) => c.position == "MAIN").map((card, i) => (
-                    <DeckCard card={card} i={i} key={card.cardId + i} />
-                ))}
-            </Grid>
-            <Grid {...cardsContainerStyles}>
-                {content.filter((c) => c.position == "EXTRA").map((card, i) => (
-                    <DeckCard card={card} i={i} key={card.cardId + i} />
-                ))}
-            </Grid>
-            <Grid {...cardsContainerStyles}>
-                {content.filter((c) => c.position == "SIDE").map((card, i) => (
-                    <DeckCard card={card} i={i} key={card.cardId + i} />
-                ))}
-            </Grid>
-        </Grid >
-        {matches.length > 0 && <Grid container mt={2}>
-            <Typography ml={2} variant="h5">DUELS</Typography>
-            <Grid container>
-                {matches.map((match) => <MatchCard key={match.id} match={match} />)}
-            </Grid>
-        </Grid>}
-    </Grid>;
+        <Grid {...loaderProps} display={loading ? "flex" : "none"} >
+            <CircularProgress color="secondary" />
+        </Grid>
+    </>;
 };
 
 const singleDeckStyles = () => {
@@ -199,8 +120,21 @@ const singleDeckStyles = () => {
         position: "relative"
     }
 
+    const loaderProps: GridProps = {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        top: 0,
+        sx: {
+            backgroundColor: "#000000dd"
+        },
+        justifyContent: "center",
+        alignItems: "center"
+    }
+
     return {
         cardsContainerStyles,
-        cardProperties
+        cardProperties,
+        loaderProps
     };
 }

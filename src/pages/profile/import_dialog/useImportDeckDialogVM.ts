@@ -5,6 +5,8 @@ import { parseURL } from "../../../utils/ydke";
 import Resizer from "react-image-file-resizer";
 import { LS_USER_DATA_KEY } from "../../../constants/keys";
 import { countCodes, exportCards, getCardsInDBByIds, importCards, linkCards } from "../../../utils/ydke-import-helper";
+import { v4 } from "uuid";
+import { DECK_GRADIENT_END, DECK_GRADIENT_START, DECK_TEXT_COLOR } from "../../../constants/colors";
 
 export const useImportDeckDialogVM = () => {
     const { getInstance } = useClient();
@@ -13,6 +15,10 @@ export const useImportDeckDialogVM = () => {
     const [ydkeURL, setydkeURL] = useState("");
     const [deckTier, setDeckTier] = useState<number>();
     const [deckImage, setDeckImage] = useState<File>();
+    const [gradientStart, setGradientStart] = useState<string>(DECK_GRADIENT_START);
+    const [gradientEnd, setGradientEnd] = useState<string>(DECK_GRADIENT_END);
+    const [textColor, setTextColor] = useState<string>(DECK_TEXT_COLOR);
+    const [deckImageURL, setDeckImageURL] = useState("/images/card-question.png");
 
     const getInitialPoints = (tier?: number) => {
         switch (tier) {
@@ -37,7 +43,10 @@ export const useImportDeckDialogVM = () => {
                 owner: userId,
                 tier: deckTier,
                 tierlist: "META",
-                points: getInitialPoints(deckTier)
+                points: getInitialPoints(deckTier),
+                gradient_color_start: gradientStart,
+                gradient_color_end: gradientEnd,
+                text_color: textColor
             } as Tables<'deck'>).select();
 
             console.log(data, error);
@@ -45,8 +54,6 @@ export const useImportDeckDialogVM = () => {
         }
         return undefined;
     }
-
-
 
     const handleDeckRollback = async (deckId: string) => {
         const supabase = getInstance();
@@ -169,14 +176,25 @@ export const useImportDeckDialogVM = () => {
 
     const handleUploadDeckImage = async (deckId: string) => {
         if (deckImage) {
+            const imageUUID = v4();
+            const imageName = `${imageUUID}.jpeg`;
+
             const supabase = getInstance();
             const { data: uploadData, error: uploadError } = await supabase.storage.from('DeckImages')
-                .upload(`${deckId}.jpeg`, deckImage, { cacheControl: '3600', upsert: false });
+                .upload(imageName, deckImage, { cacheControl: '3600', upsert: false });
 
             console.log("File uploaded: ", uploadData);
             console.log("File uploaded id: ", uploadData?.id);
             uploadError && console.log("File upload error: ", uploadError);
-            return !uploadError;
+
+            const { data: updateData, error: updateError } = await supabase.from("deck")
+                .update({ image: imageName })
+                .eq("id", deckId)
+                .select();
+            updateError && console.log("Image name update on deck error: ", updateError);
+            console.log("Image updated on deck: ", updateData);
+
+            return !uploadError && !updateError;
         }
 
         return false;
@@ -198,21 +216,46 @@ export const useImportDeckDialogVM = () => {
 
     const onChangeDeckImage = (ev: ChangeEvent<HTMLInputElement>) => {
         const files = ev.target.files;
-        const imagePreview = document.getElementById('deck-image-preview') as HTMLImageElement;
-
         if (files && files[0]) {
             console.log(files[0])
             handleResizeDeckImage(files[0]).then((res) => {
-                imagePreview.src = URL.createObjectURL(res)
                 setDeckImage(res);
+                setDeckImageURL(URL.createObjectURL(res))
             }).catch(() => {
-                imagePreview.removeAttribute("src");
                 setDeckImage(undefined);
+                setDeckImageURL("/images/card-question.png");
             })
         } else {
-            imagePreview.removeAttribute("src");
             setDeckImage(undefined);
+            setDeckImageURL("/images/card-question.png");
         }
+    }
+
+    let gradientStartTimeout: NodeJS.Timeout;
+    const onGradientStartChange = (val: string) => {
+        gradientStartTimeout && clearTimeout(gradientStartTimeout);
+        const timeout = setTimeout(() => {
+            setGradientStart(val)
+        })
+        gradientStartTimeout = timeout
+    }
+
+    let gradientEndTimeout: NodeJS.Timeout;
+    const onGradientEndChange = (val: string) => {
+        gradientEndTimeout && clearTimeout(gradientEndTimeout);
+        const timeout = setTimeout(() => {
+            setGradientEnd(val)
+        })
+        gradientEndTimeout = timeout
+    }
+
+    let textColorTimeout: NodeJS.Timeout;
+    const onTextColorChange = (val: string) => {
+        textColorTimeout && clearTimeout(textColorTimeout);
+        const timeout = setTimeout(() => {
+            setTextColor(val)
+        })
+        textColorTimeout = timeout
     }
 
     return {
@@ -224,6 +267,13 @@ export const useImportDeckDialogVM = () => {
         setydkeURL,
         deckTier,
         setDeckTier,
+        gradientStart,
+        onGradientStartChange,
+        gradientEnd,
+        onGradientEndChange,
+        textColor,
+        onTextColorChange,
+        deckImageURL,
         handleUploadDeck,
         onChangeDeckImage
     }

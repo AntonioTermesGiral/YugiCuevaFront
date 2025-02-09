@@ -9,7 +9,7 @@ export const Search = () => {
     const navLocation = useLocation();
 
     useEffect(() => {
-        setSearched(navLocation.search != "");
+        setSearched(navLocation.search.trim() !== "");
     }, [navLocation.search]);
 
     return (

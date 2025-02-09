@@ -4,6 +4,8 @@ import Resizer from "react-image-file-resizer";
 import { parseURL } from "../../../utils/ydke";
 import { countCodes, exportCards, getCardsInDBByIds, importCards, linkCards } from "../../../utils/ydke-import-helper";
 import { Tables } from "../../../database.types";
+import { v4 } from "uuid";
+import { DECK_GRADIENT_END, DECK_GRADIENT_START, DECK_TEXT_COLOR } from "../../../constants/colors";
 
 export const useEditDeckDialogVM = () => {
     const { getInstance } = useClient();
@@ -12,7 +14,12 @@ export const useEditDeckDialogVM = () => {
     const [deckId, setDeckId] = useState<string>();
     const [deckName, setDeckName] = useState("");
     const [ydkeURL, setydkeURL] = useState("");
-    const [originalDeckPictureUrl, setOriginalDeckPictureUrl] = useState("/images/default-profile.jpg");
+    const [currentTier, setCurrentTier] = useState("");
+    const [currentImageName, setCurrentImageName] = useState<string | null>(null);
+    const [gradientStart, setGradientStart] = useState<string>(DECK_GRADIENT_START);
+    const [gradientEnd, setGradientEnd] = useState<string>(DECK_GRADIENT_END);
+    const [textColor, setTextColor] = useState<string>(DECK_TEXT_COLOR);
+    const [deckImageURL, setDeckImageURL] = useState<string>();
 
     const loadDefaultValues = async () => {
         const supabase = getInstance();
@@ -24,11 +31,15 @@ export const useEditDeckDialogVM = () => {
             const { data: deckData, error } = await supabase.from('deck').select().eq('id', currentDeckId);
             error && console.log(error, deckData);
 
-            const currentDeckPic = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + currentDeckId + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT + "?ver=" + new Date().getTime();
-
             // Sets the values
-            currentDeckPic && setOriginalDeckPictureUrl(currentDeckPic);
             setDeckName(deckData[0].name);
+            setCurrentTier(deckData[0].tier)
+            deckData[0].image !== null && setCurrentImageName(deckData[0].image)
+            deckData[0].gradient_color_start !== null && setGradientStart(deckData[0].gradient_color_start)
+            deckData[0].gradient_color_end !== null && setGradientEnd(deckData[0].gradient_color_end)
+            deckData[0].text_color !== null && setTextColor(deckData[0].text_color)
+
+            deckData[0].image !== null && setDeckImageURL(import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deckData[0].image);
         }
     }
 
@@ -135,12 +146,17 @@ export const useEditDeckDialogVM = () => {
 
         const { data, error } = await supabase
             .from('deck')
-            .update({ name: deckName })
+            .update({
+                name: deckName,
+                gradient_color_start: gradientStart,
+                gradient_color_end: gradientEnd,
+                text_color: textColor
+            })
             .eq('id', deckId)
             .select();
 
-        console.log("Name update: " + data);
-        error && console.log("Name update error: " + error);
+        console.log("Name + styles update: " + data);
+        error && console.log("Name + styles update error: " + error);
 
         handleUpdateDeckImage().then((success) => {
             if (success) {
@@ -157,18 +173,39 @@ export const useEditDeckDialogVM = () => {
 
     const handleUpdateDeckImage = async () => {
         if (deckImage) {
+            const imageUUID = v4();
+            const newImageName = `${imageUUID}.jpeg`;
+
             const supabase = getInstance();
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('DeckImages')
-                .upload(`${deckId}.jpeg`, deckImage, {
+                .upload(newImageName, deckImage, {
                     cacheControl: '3600',
-                    upsert: true
+                    upsert: false
                 });
 
             console.log("File uploaded: ", uploadData);
             uploadError && console.log("File upload error: ", uploadError);
-            return !uploadError;
+
+            const { data: updateData, error: updateError } = await supabase.from("deck")
+                .update({ image: newImageName })
+                .eq("id", deckId)
+                .select();
+            updateError && console.log("Image name update on deck error: ", updateError);
+            console.log("Image updated on deck: ", updateData);
+
+            if (currentImageName !== null) {
+                const { data: deletionData, error: deletionError } = await supabase
+                    .storage
+                    .from('DeckImages')
+                    .remove([currentImageName])
+
+                console.log(currentImageName, deletionData)
+                deletionError && console.log("File deletion error: ", deletionError);
+            }
+
+            return !uploadError && !updateError;
         }
 
         return false;
@@ -190,33 +227,65 @@ export const useEditDeckDialogVM = () => {
 
     const onChangeDeckImage = (ev: ChangeEvent<HTMLInputElement>) => {
         const files = ev.target.files;
-        const imagePreview = document.getElementById('deck-image-preview') as HTMLImageElement;
-
         if (files && files[0]) {
             console.log(files[0])
             handleResizeDeckImage(files[0]).then((res) => {
-                imagePreview.src = URL.createObjectURL(res)
                 setDeckImage(res);
+                setDeckImageURL(URL.createObjectURL(res))
             }).catch(() => {
-                imagePreview.removeAttribute("src");
                 setDeckImage(undefined);
+                setDeckImageURL("/images/card-question.png")
             })
         } else {
-            imagePreview.removeAttribute("src");
             setDeckImage(undefined);
+            setDeckImageURL("/images/card-question.png");
         }
+    }
+
+    let gradientStartTimeout: NodeJS.Timeout;
+    const onGradientStartChange = (val: string) => {
+        gradientStartTimeout && clearTimeout(gradientStartTimeout);
+        const timeout = setTimeout(() => {
+            setGradientStart(val)
+        })
+        gradientStartTimeout = timeout
+    }
+
+    let gradientEndTimeout: NodeJS.Timeout;
+    const onGradientEndChange = (val: string) => {
+        gradientEndTimeout && clearTimeout(gradientEndTimeout);
+        const timeout = setTimeout(() => {
+            setGradientEnd(val)
+        })
+        gradientEndTimeout = timeout
+    }
+
+    let textColorTimeout: NodeJS.Timeout;
+    const onTextColorChange = (val: string) => {
+        textColorTimeout && clearTimeout(textColorTimeout);
+        const timeout = setTimeout(() => {
+            setTextColor(val)
+        })
+        textColorTimeout = timeout
     }
 
     useEffect(() => { loadDefaultValues(); }, []);
 
     return {
+        currentTier,
         editDialogOpen,
         setEditDialogOpen,
         deckName,
         setDeckName,
         ydkeURL,
         setydkeURL,
-        originalDeckPictureUrl,
+        gradientStart,
+        onGradientStartChange,
+        gradientEnd,
+        onGradientEndChange,
+        textColor,
+        onTextColorChange,
+        deckImageURL,
         onChangeDeckImage,
         handleUpdateDeck
     }

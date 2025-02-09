@@ -2,15 +2,16 @@ import { Grid, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Tables } from "../../database.types"
 import { useClient } from "../../client/useClient"
-import { DeckCard } from "../../components/DeckCard"
 import { useLocation } from "react-router-dom"
 import { UserCard } from "../../components/UserCard"
+import { DeckCard } from "../../components/deck-card/DeckCard"
 
 export const FilledSearch = () => {
     const { getInstance } = useClient();
     const loc = useLocation();
     const [foundDecks, setFoundDecks] = useState<Tables<"deck">[]>([]);
     const [foundUsers, setFoundUsers] = useState<Tables<"profile">[]>([]);
+    const [deckOwners, setDeckOwners] = useState<Tables<"profile">[]>([]);
 
     const loadData = async () => {
         const supabase = getInstance();
@@ -32,17 +33,27 @@ export const FilledSearch = () => {
 
         usersError && console.log(usersError);
 
+        let ownersData = [];
+        if (decksData.length > 0) {
+            const { data: deckOwnersData, error: deckOwnersError } = await supabase.from('profile')
+                .select()
+                .in('id', (decksData as Tables<"deck">[]).map((d) => d.owner))
+
+            deckOwnersError && console.log(deckOwnersError);
+            ownersData = deckOwnersData;
+        }
 
         console.log(decksData, usersData);
 
-        return { decks: decksData, users: usersData };
+        return { decks: decksData, users: usersData, owners: ownersData };
 
     }
 
     useEffect(() => {
-        loadData().then(({ decks, users }) => {
+        loadData().then(({ decks, users, owners }) => {
             setFoundDecks(decks);
             setFoundUsers(users);
+            setDeckOwners(owners)
         });
     }, [loc.pathname])
 
@@ -54,7 +65,7 @@ export const FilledSearch = () => {
                 <Grid container>
                     {foundDecks.map((currentDeck) => (
                         <Grid item key={currentDeck.id} minWidth="250px" m={1}>
-                            <DeckCard deck={currentDeck} />
+                            <DeckCard deck={currentDeck} users={deckOwners} />
                         </Grid>
                     ))}
                 </Grid>
@@ -64,7 +75,7 @@ export const FilledSearch = () => {
                 <Grid container>
                     {foundUsers.map((currentUser) => (
                         <Grid item m={1} key={currentUser.id} minWidth="250px">
-                            <UserCard user={currentUser}/>
+                            <UserCard user={currentUser} />
                         </Grid>
                     ))}
                 </Grid>

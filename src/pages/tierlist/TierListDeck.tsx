@@ -1,67 +1,53 @@
-import { ImageListItem, ImageListItemBar, IconButton } from "@mui/material"
+import { Box, Chip } from "@mui/material"
 import { Tables } from "../../database.types"
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useClient } from "../../client/useClient";
-import InfoIcon from '@mui/icons-material/Info';
+import styled from "@emotion/styled";
 
 interface ITierListDeck {
     deck: Tables<"deck">;
+    owners: Tables<"profile">[];
 }
 
-export const TierListDeck = ({ deck }: ITierListDeck) => {
+export const TierListDeck = ({ deck, owners }: ITierListDeck) => {
     const navigate = useNavigate();
-    const { getInstance } = useClient();
-    const supabase = getInstance();
-    const [hasImage, setHasImage] = useState(false);
-    const [ownerName, setOwnerName] = useState<string>();
+    const [deckImage, setDeckImage] = useState("/images/card-question.png");
+    const [ownerImage, setOwnerImage] = useState<string>("/images/default-profile.jpg");
 
     const handleSearchImage = async () => {
-        const { data, error } = await supabase
-            .storage
-            .from('DeckImages')
-            .list('', {
-                limit: 1,
-                offset: 0,
-                search: deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT
-            });
+        deck.image !== null && setDeckImage(import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deck.image);
 
-        setHasImage(!error && data.length > 0);
-
-        const { data: dname, error: dnameError } = await supabase
-            .from('profile')
-            .select('display_name')
-            .eq('id', deck.owner);
-
-        if (dname[0]) {
-            setOwnerName(dname[0].display_name);
-        }
-        dnameError && console.log("Owner get error on deck", deck.id, ":", dnameError);
+        const deckOwner = owners.find((ow) => ow.id === deck.owner)
+        if (deckOwner && deckOwner.image !== null)
+            setOwnerImage(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + deckOwner.image);
     }
 
     useEffect(() => {
         handleSearchImage();
     }, []);
 
+    const StyledBox = styled(Box)(() => ({
+        transition: "transform 0.15s ease-in-out",
+        "&:hover": { transform: "scale3d(1.05, 1.05, 1)" },
+        width: "9em",
+        height: "9em"
+    }))
+
     return (
-        <ImageListItem key={deck.id} sx={{ maxHeight: "10em" }}>
+        <StyledBox key={deck.id} position="relative" onClick={() => navigate("/deck/?id=" + deck.id)}>
             <img
-                style={{ maxHeight: "inherit", minHeight: "10rem" }}
-                src={hasImage ?
-                    import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + deck.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT + "?ver=" + new Date().getTime()
-                    : "/images/card-question.png"}
+                style={{ objectFit: "cover" }}
+                height="100%" width="100%"
+                src={deckImage}
                 alt={deck.name}
                 loading="lazy"
             />
-            <ImageListItemBar
-                title={deck.name}
-                subtitle={ownerName}
-                actionIcon={
-                    <IconButton sx={{ color: 'white' }} onClick={() => navigate("/deck/?id=" + deck.id)}>
-                        <InfoIcon/>
-                    </IconButton>
-                }
-            />
-        </ImageListItem>
+            <Box position="absolute" zIndex={1} height="45px" width="45px" overflow="hidden" borderRadius="50%" top={3} right={3}>
+                <img src={ownerImage} height="100%" width="100%" style={{ objectFit: "cover" }} />
+            </Box>
+            <Box position="absolute" zIndex={1} bottom={3} right={3}>
+                <Chip label={deck.points === null ? "N/A" : deck.points} sx={{ color: "white", backgroundColor: "#000000cc" }} />
+            </Box>
+        </StyledBox >
     )
 }

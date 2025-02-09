@@ -12,9 +12,7 @@ export const EmptySearch = () => {
         if (searchValue.trim() != "") {
             setEmptySearch(false);
             navigate("/search/?q=" + searchValue);
-        } else {
-            setEmptySearch(true);
-        }
+        } else setEmptySearch(true);
     }
 
     return (
@@ -23,7 +21,12 @@ export const EmptySearch = () => {
                 <Typography variant="h5" mb={2}>
                     Intenta buscar algo!
                 </Typography>
-                <TextField name="cave-search" sx={{ mb: 2 }} value={searchValue} onChange={(e) => setSearchValue(e.target.value)} error={emptySearch} helperText={emptySearch ? "Campo vacío..." : ""}/>
+                <TextField
+                    sx={{ mb: 2 }}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    error={emptySearch}
+                />
                 <Button variant="contained" onClick={onSearch}>Buscar</Button>
             </Paper>
         </Grid>

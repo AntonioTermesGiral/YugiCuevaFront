@@ -4,15 +4,15 @@ import { useCreatematchDialogViewModel } from "./useCreateMatchDialogViewModel";
 import CloseIcon from '@mui/icons-material/Close';
 
 interface ISelectedItemImage {
-    id?: string,
+    image?: string | null,
     type: "deck" | "player"
 }
-const SelectedItemImage = ({ id, type }: ISelectedItemImage) => {
-    if (id === undefined) return null;
+const SelectedItemImage = ({ image, type }: ISelectedItemImage) => {
+    if (image === undefined || image === null) return null;
 
-    let url = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT;
+    let url = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + image;
     if (type === "player")
-        url = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT;
+        url = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + image;
 
     return (
         <img
@@ -78,7 +78,7 @@ export const CreateMatchDialog = ({ refreshData }: { refreshData: () => void }) 
                             </Typography>
                             <Grid container my={1} alignItems="center">
                                 <DeckAutocomplete currentDeck={deck1} setCurrentDeck={setDeck1} />
-                                <SelectedItemImage id={deck1?.id} type="deck" />
+                                <SelectedItemImage image={deck1?.image} type="deck" />
                             </Grid>
                             <Grid my={1}>
                                 <Typography>
@@ -97,7 +97,7 @@ export const CreateMatchDialog = ({ refreshData }: { refreshData: () => void }) 
                             </Typography>
                             <Grid container my={1} alignItems="center">
                                 <DeckAutocomplete currentDeck={deck2} setCurrentDeck={setDeck2} />
-                                <SelectedItemImage id={deck2?.id} type="deck" />
+                                <SelectedItemImage image={deck2?.image} type="deck" />
                             </Grid>
                             <Grid my={1}>
                                 <Typography>

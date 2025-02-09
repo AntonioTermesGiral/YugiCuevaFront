@@ -2,12 +2,17 @@ import { Box, Button, Dialog, Grid, Typography } from "@mui/material";
 import { useDeleteDeckDialogVM } from "./useDeleteDeckDialogVM";
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
-export const DeleteDeckDialog = () => {
+export interface IDeleteDeckDialog {
+    deckId?: string;
+    deckImageId?: string | null;
+}
+
+export const DeleteDeckDialog = (props: IDeleteDeckDialog) => {
     const {
         deleteDialogOpen,
         setDeleteDialogOpen,
         onDeleteSubmit
-    } = useDeleteDeckDialogVM();
+    } = useDeleteDeckDialogVM(props);
 
     return (
         <>

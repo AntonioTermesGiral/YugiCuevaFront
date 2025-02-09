@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useClient } from "../../../client/useClient";
 import Resizer from "react-image-file-resizer";
 import { LS_USER_DATA_KEY } from "../../../constants/keys";
+import { v4 } from "uuid";
 
 export const useEditProfileDialogVM = () => {
     const { getInstance } = useClient();
@@ -11,6 +12,7 @@ export const useEditProfileDialogVM = () => {
     const [profileImage, setProfileImage] = useState<File>();
     const [userId, setUserId] = useState<string>();
     const [originalPfpUrl, setOriginalPfpUrl] = useState("/images/default-profile.jpg");
+    const [currentImageName, setCurrentImageName] = useState<string | null>(null);
 
     const loadDefaultValues = async () => {
         const supastorage = localStorage.getItem(LS_USER_DATA_KEY);
@@ -22,7 +24,8 @@ export const useEditProfileDialogVM = () => {
             const { data: profile, error } = await supabase.from('profile').select().eq('id', JSON.parse(supastorage).user.id);
             error && console.log(error, profile);
 
-            const pfpName = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + JSON.parse(supastorage).user.id + import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_EXT + "?ver=" + new Date().getTime();
+            const pfpName = import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + profile[0].image;
+            setCurrentImageName(profile[0].image);
 
             // Sets the values
             pfpName && setOriginalPfpUrl(pfpName);
@@ -58,18 +61,41 @@ export const useEditProfileDialogVM = () => {
 
     const handleUpdateProfileImage = async () => {
         if (profileImage) {
+            const imageUUID = v4();
+            const imageName = `${imageUUID}.jpeg`;
+
             const supabase = getInstance();
             const { data: uploadData, error: uploadError } = await supabase
                 .storage
                 .from('Pfps')
-                .upload(`${userId}.jpeg`, profileImage, {
+                .upload(imageName, profileImage, {
                     cacheControl: '3600',
                     upsert: true
                 });
 
             console.log("File uploaded: ", uploadData);
             uploadError && console.log("File upload error: ", uploadError);
-            return !uploadError;
+
+            const { data: updateData, error: updateError } = await supabase.from("profile")
+                .update({ image: imageName })
+                .eq("id", userId)
+                .select();
+            updateError && console.log("Image name update on deck error: ", updateError);
+            console.log("Image updated on deck: ", updateData);
+
+            if (currentImageName !== null) {
+                const { data: deletionData, error: deletionError } = await supabase
+                    .storage
+                    .from('Pfps')
+                    .remove([currentImageName])
+
+                console.log(currentImageName, deletionData)
+                deletionError && console.log("File deletion error: ", deletionError);
+            }
+
+            localStorage.setItem("current-user-pfp", import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + imageName);
+
+            return !uploadError && !updateError;
         }
 
         return false;

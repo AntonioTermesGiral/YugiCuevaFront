@@ -1,8 +1,10 @@
 import { Button, Dialog, Typography, TextField, Grid, styled } from "@mui/material"
 import { useImportDeckDialogVM } from "./useImportDeckDialogVM"
 import { maxTier } from "../../../constants/tiers";
+import { DeckCard } from "../../../components/deck-card/DeckCard";
+import { MOCKED_DECK } from "../../../constants/mocked-data/mocked_deck";
 
-export const ImportDeckDialog = () => {
+export const ImportDeckDialog = ({ userImage }: { userImage?: string | null }) => {
     const {
         importDialogOpen,
         setImportDialogOpen,
@@ -12,6 +14,13 @@ export const ImportDeckDialog = () => {
         setydkeURL,
         deckTier,
         setDeckTier,
+        gradientStart,
+        onGradientStartChange,
+        gradientEnd,
+        onGradientEndChange,
+        textColor,
+        onTextColorChange,
+        deckImageURL,
         handleUploadDeck,
         onChangeDeckImage
     } = useImportDeckDialogVM();
@@ -45,7 +54,7 @@ export const ImportDeckDialog = () => {
                         </Grid>
                     </Grid>
                     <Grid item container justifyContent="space-between">
-                        <Grid item xs={12} sm={5.5}>
+                        <Grid item xs={12} sm={5}>
                             <Button
                                 component="label"
                                 role={undefined}
@@ -61,16 +70,23 @@ export const ImportDeckDialog = () => {
                                     onChange={onChangeDeckImage}
                                 />
                             </Button>
+                            <TextField fullWidth sx={{ my: 1 }} label="Gradient End" value={gradientEnd} onChange={(e) => onGradientEndChange(e.target.value)} type="color" />
+                            <TextField fullWidth sx={{ my: 1 }} label="Gradient Start" value={gradientStart} onChange={(e) => onGradientStartChange(e.target.value)} type="color" />
+                            <TextField fullWidth sx={{ my: 1 }} label="Text Color" value={textColor} onChange={(e) => onTextColorChange(e.target.value)} type="color" />
                         </Grid>
-                        <Grid item xs={12} sm={5.5}>
-                            <img
-                                id="deck-image-preview"
-                                width="225"
-                                height="175"
-                                style={{
-                                    backgroundImage: 'url("/images/card-question.png")',
-                                    backgroundSize: "cover",
-                                    objectFit: "cover"
+                        <Grid item xs={12} sm={6.5}>
+                            <DeckCard
+                                deck={MOCKED_DECK}
+                                users={[]}
+                                previewParams={{
+                                    name: deckName.trim() !== "" ? deckName : "Dummy Text",
+                                    tier: (deckTier === undefined || isNaN(deckTier)) ? "N/A" : deckTier.toString(),
+                                    points: "0",
+                                    startColor: gradientStart,
+                                    endColor: gradientEnd,
+                                    textColor: textColor,
+                                    deckImage: deckImageURL ?? "/images/card-question.png",
+                                    ownerImage: userImage ?? "/images/default-profile.jpg"
                                 }}
                             />
                         </Grid>

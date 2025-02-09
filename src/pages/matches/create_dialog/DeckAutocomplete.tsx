@@ -61,7 +61,7 @@ export const DeckAutocomplete = ({ currentDeck, setCurrentDeck }: IDeckAutocompl
             )}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props as GenericAutocompleteItemType;
-                const imgUrl = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + option.id + import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_EXT// + "?ver=" + new Date().getTime();
+                const imgUrl = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + option.image
                 return (
                     <li key={key} {...optionProps}>
                         <img height="50px" width="50px" style={{ marginRight: 10 }} src={imgUrl} />

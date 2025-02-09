@@ -26,3 +26,5 @@ export interface IRawMatchesData {
     matchesObj: { data: Tables<'match'>[], error: unknown };
     matchesDataObj: { data: Tables<'match_data'>[], error: unknown };
 }
+
+export interface IIDToSearch { match_id: string }[]

@@ -1,64 +1,41 @@
-import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid } from "@mui/material"
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserRoute } from "../utils/getUserRoute";
+import { Box, AppBar, Toolbar, Button, Paper, IconButton, InputBase, Divider, Grid, DividerProps } from "@mui/material"
+import { getUserRoute } from "../../utils/getUserRoute";
 import { DARK_BLUE } from "../../constants/colors";
 import SearchIcon from '@mui/icons-material/Search';
+import { useToolbar } from "./useToolbar";
+import { CSSProperties } from "react";
 
 export const YGCDesktopToolbar = () => {
-    const navigate = useNavigate();
-
-    const [searchBarValue, setSearchBarValue] = useState("");
-    const [pfpUrl, setPfpUrl] = useState("/images/default-profile.jpg");
-
-    const handleSearchSubmit = () => {
-        if (searchBarValue.trim() != "") {
-            navigate("/search/?q=" + searchBarValue);
-            setSearchBarValue("");
-        }
-    }
-
-    useEffect(() => {
-        const userPFP = localStorage.getItem('current-user-pfp');
-        userPFP && setPfpUrl(userPFP);
-    }, [])
+    const {
+        searchBarValue,
+        pfpUrl,
+        handleSearchSubmit,
+        handleNavigate,
+        onChangeSearchValue
+    } = useToolbar();
 
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
-                <Toolbar sx={{ backgroundColor: DARK_BLUE, p: 1 }}>
+                <Toolbar sx={styles.toolbar}>
                     <Grid container>
                         <Grid item display="flex" alignItems="center" xs={8}>
-                            <img
-                                width="69"
-                                height="69"
-                                src={pfpUrl}
-                                style={{
-                                    backgroundImage: 'url("/images/default-profile.jpg")',
-                                    backgroundSize: "cover",
-                                    objectFit: "cover",
-                                    borderRadius: "50%",
-                                    border: "solid 2px black",
-                                    marginRight: 10,
-                                    cursor: "pointer"
-                                }}
-                                onClick={() => navigate(getUserRoute())}
-                            />
-                            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/tierlists/meta")}>Tierlist</Button>
-                            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={() => navigate("/duels")}>Duels</Button>
+                            <img {...styles.profilePicture} src={pfpUrl} onClick={() => handleNavigate(getUserRoute())} />
+                            <Divider {...styles.divider} />
+                            <Button sx={styles.navButton} onClick={() => handleNavigate("/tierlists/meta")}>Tierlist</Button>
+                            <Divider {...styles.divider} />
+                            <Button sx={styles.navButton} onClick={() => handleNavigate("/duels")}>Duels</Button>
                         </Grid>
                         <Grid item xs={4}>
-                            <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}>
+                            <Paper sx={styles.searchContainer}>
                                 <InputBase
                                     sx={{ ml: 1, flex: 1 }}
                                     placeholder="Search..."
                                     value={searchBarValue}
                                     onKeyDown={(e) => { if (e.key == "Enter" || e.code == "Enter") handleSearchSubmit(); }}
-                                    onChange={(e) => setSearchBarValue(e.target.value)}
+                                    onChange={onChangeSearchValue}
                                 />
-                                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                                <Divider {...styles.divider} />
                                 <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearchSubmit}>
                                     <SearchIcon />
                                 </IconButton>
@@ -69,4 +46,41 @@ export const YGCDesktopToolbar = () => {
             </AppBar>
         </Box>
     )
+}
+
+const styles = {
+    toolbar: {
+        backgroundColor: DARK_BLUE,
+        p: 1
+    },
+    profilePicture: {
+        width: "69",
+        height: "69",
+        style: {
+            backgroundImage: 'url("/images/default-profile.jpg")',
+            backgroundSize: "cover",
+            objectFit: "cover",
+            borderRadius: "50%",
+            border: "solid 2px black",
+            marginRight: 10,
+            cursor: "pointer"
+        } as CSSProperties
+    },
+    divider: {
+        sx: {
+            height: 28,
+            m: 0.5
+        },
+        orientation: "vertical"
+    } as DividerProps,
+    searchContainer: {
+        p: '2px 4px',
+        display: 'flex',
+        alignItems: 'center'
+    },
+    navButton: {
+        my: 2,
+        color: 'white',
+        display: 'block'
+    }
 }
