@@ -29,7 +29,9 @@ export const useImportDeckDialogVM = () => {
             case 4: return 125;
             case 5: return 75;
             case 6: return 25;
-            default: return 0;
+            case 7: return -25;
+            case 8: return -75;
+            default: return -100;
         }
     }
 

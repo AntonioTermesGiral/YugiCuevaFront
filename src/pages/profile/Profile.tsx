@@ -73,7 +73,7 @@ export const Profile = () => {
                 {selectedTab == "DECKS" ?
                     <Grid container>
                         {isCurrentUser && <ImportDeckDialog userImage={import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + user?.image} />}
-                        <Grid container gap={1.5} justifyContent={matchesSM ? "flex-start" : "center"}>
+                        <Grid container gap={1.5} justifyContent={matchesSM ? "flex-start" : "center"} mt={2}>
                             {decks.map((deck) => <DeckCard deck={deck} users={user ? [user] : []} key={deck.id} />)}
                         </Grid>
                     </Grid>
