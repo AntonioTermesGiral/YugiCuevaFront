@@ -4,9 +4,24 @@ import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
 import { IMatch } from "../matches/data-load/match_data_interfaces";
 import { buildMatchData, fetchMatchDataByDeck } from "../matches/data-load/match_data_loaders";
+import { sortCardsInDeck } from "../../utils/sortHelper";
+
+interface ICardSimpleData {
+    type: string;
+    level: number | null;
+    linkval: number | null;
+    atk: number | null;
+    def: number | null;
+    race_type: string;
+}
+
+export interface ICardSimpleDBData extends Tables<'card_in_deck'> {
+    card: ICardSimpleData;
+}
 
 export interface IDeckContent {
     cardId: number;
+    cardSimpleData: ICardSimpleData;
     qty: number;
     cardImage: string;
     position?: Enums<'CardPosition'>;
@@ -52,7 +67,19 @@ export const useSingleDeckViewModel = () => {
             deckError && console.error(deckError);
 
             // Links search by deck id
-            const { data: linksData, error: linksError } = await supabase.from('card_in_deck').select().eq("deck_id", deckID);
+            const { data: linksData, error: linksError } = await supabase.from('card_in_deck').select(`
+                card_id,
+                quantity,
+                position,
+                card(
+                    type,
+                    level,
+                    linkval,
+                    atk,
+                    def,
+                    race_type
+                )
+                `).eq("deck_id", deckID);
             linksError && console.error(linksError);
 
             // Author search by id
@@ -65,18 +92,19 @@ export const useSingleDeckViewModel = () => {
             matchesDataObj.error && console.log(matchesDataObj.error);
             const matchesData = await buildMatchData(supabase, { matchesObj, matchesDataObj });
 
-            const dContent = linksData.map((link: Tables<'card_in_deck'>) => {
+            const dContent = linksData.map((link: ICardSimpleDBData) => {
                 return {
                     cardId: link.card_id,
                     cardImage: import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + link.card_id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT + "?ver=" + new Date().getTime(),
                     qty: link.quantity,
-                    position: link.position
+                    position: link.position,
+                    cardSimpleData: link.card
                 } as IDeckContent;
             });
 
             return {
                 deckData: deckData[0],
-                deckContents: dContent,
+                deckContents: sortCardsInDeck(dContent),
                 authorData: {
                     authorDisplayName: authorDN[0].display_name,
                     authorId: authorDN[0].id,

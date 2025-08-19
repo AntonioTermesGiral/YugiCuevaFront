@@ -1,10 +1,11 @@
-import { CircularProgress, Grid, GridProps, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { CircularProgress, Grid, GridProps, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
 import { DeleteDeckDialog } from "./delete_dialog/DeleteDeckDialog";
 import { YDKEGenerateDialog } from "./ydke_generate_dialog/YDKEGenerateDialog";
 import { MatchCard } from "../matches/MatchCard";
 import { IDeckContent, useSingleDeckViewModel } from "./useSingleDeckViewModel";
+import { Enums } from "../../database.types";
 
 export const SingleDeck = () => {
     const navigate = useNavigate();
@@ -18,30 +19,24 @@ export const SingleDeck = () => {
     } = useSingleDeckViewModel();
     const { cardsContainerStyles, cardProperties, loaderProps } = singleDeckStyles();
 
-    const theme = useTheme();
-    const matchesMD = useMediaQuery(theme.breakpoints.up('sm'));
-    const matchesLG = useMediaQuery(theme.breakpoints.up('md'));
-
-    const getCardSizes = () => {
-        if (matchesLG) return { height: 156.4, width: 107.2 };
-        if (matchesMD) return { height: 117.3, width: 80.4 };
-        if (!matchesMD) return { height: 78.2, width: 53.6 };
-        return { height: 156.4, width: 107.2 };
-    }
-
     const DeckCard = ({ card, i }: { card: IDeckContent, i: number }) =>
         <Grid {...cardProperties} key={card.cardId + "card" + i}
             onClick={() => navigate("/card/?id=" + card.cardId)}>
-            <Grid position="absolute" right="10px" bottom="10px">
-                <Typography variant={matchesLG ? "h3" : matchesMD ? "h4" : "h5"} sx={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000", color: "white" }}>
-                    x{card.qty}
-                </Typography>
-            </Grid>
-            <img height={getCardSizes().height} width={getCardSizes().width} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
+            <img height={150} width={100} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
         </Grid>;
 
+    const renderDeckCards = (position: Enums<'CardPosition'>) => {
+        const cardList = content.filter((c) => c.position == position);
+
+        return cardList.map((card, i) => (
+            new Array(card.qty).fill("").map((_, j) => (
+                <DeckCard card={card} i={card.cardId + i + j} key={card.cardId + i + j} />
+            ))
+        ))
+    }
+
     return <>
-        <Grid container direction="column" px={2} mt={2}>
+        <Grid container direction="column" px={{ xs: 2, lg: 16 }} mt={2}>
             <Grid my={2}>
                 <Grid container>
                     <Grid item xs={12} sm={9}>
@@ -71,20 +66,19 @@ export const SingleDeck = () => {
                 }
             </Grid>
             <Grid container direction="column" justifyContent="center">
+                <Typography variant="h4">Main Deck</Typography>
                 <Grid {...cardsContainerStyles}>
-                    {content.filter((c) => c.position == "MAIN").map((card, i) => (
-                        <DeckCard card={card} i={i} key={card.cardId + i} />
-                    ))}
+                    {renderDeckCards("MAIN")}
                 </Grid>
+
+                <Typography variant="h4">Extra Deck</Typography>
                 <Grid {...cardsContainerStyles}>
-                    {content.filter((c) => c.position == "EXTRA").map((card, i) => (
-                        <DeckCard card={card} i={i} key={card.cardId + i} />
-                    ))}
+                    {renderDeckCards("EXTRA")}
                 </Grid>
+
+                <Typography variant="h4">Side Deck</Typography>
                 <Grid {...cardsContainerStyles}>
-                    {content.filter((c) => c.position == "SIDE").map((card, i) => (
-                        <DeckCard card={card} i={i} key={card.cardId + i} />
-                    ))}
+                    {renderDeckCards("SIDE")}
                 </Grid>
             </Grid >
             {matches.length > 0 && <Grid container mt={2}>
@@ -93,7 +87,7 @@ export const SingleDeck = () => {
                     {matches.map((match) => <MatchCard key={match.id} match={match} />)}
                 </Grid>
             </Grid>}
-        </Grid>
+        </Grid >
         <Grid {...loaderProps} display={loading ? "flex" : "none"} >
             <CircularProgress color="secondary" />
         </Grid>
@@ -102,8 +96,6 @@ export const SingleDeck = () => {
 
 const singleDeckStyles = () => {
     const cardsContainerStyles: GridProps = {
-        style: { backgroundColor: "lightgray" },
-        borderRadius: "10px",
         p: "0.5rem",
         my: 2,
         container: true
@@ -117,7 +109,8 @@ const singleDeckStyles = () => {
                 scale: "120%"
             }
         },
-        position: "relative"
+        xs: 2.4,
+        sm: 1.2
     }
 
     const loaderProps: GridProps = {
