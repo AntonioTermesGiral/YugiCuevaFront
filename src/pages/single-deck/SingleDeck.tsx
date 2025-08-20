@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, GridProps, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, GridProps, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { EditDeckDialog } from "./edit_dialog/EditDeckDialog";
 import { DeleteDeckDialog } from "./delete_dialog/DeleteDeckDialog";
@@ -6,6 +6,7 @@ import { YDKEGenerateDialog } from "./ydke_generate_dialog/YDKEGenerateDialog";
 import { MatchCard } from "../matches/MatchCard";
 import { IDeckContent, useSingleDeckViewModel } from "./useSingleDeckViewModel";
 import { Enums } from "../../database.types";
+import { colorLoop } from "../../constants/colors";
 
 export const SingleDeck = () => {
     const navigate = useNavigate();
@@ -39,8 +40,25 @@ export const SingleDeck = () => {
         <Grid container direction="column" px={{ xs: 2, lg: 16 }} mt={2}>
             <Grid my={2}>
                 <Grid container>
-                    <Grid item xs={12} sm={9}>
-                        <Typography variant="h2" mb={2}>{deckData?.name ?? "?"}</Typography>
+                    <Grid item container alignItems="center" xs={12} sm={9}>
+                        <Typography variant="h2" mb={2} mr={2}>{deckData?.name ?? "?"}</Typography>
+                        {deckData?.tierlist &&
+                            <Box
+                                onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}
+                                sx={{
+                                    backgroundColor: deckData?.tier !== null ? colorLoop[deckData.tier] : "gray",
+                                    width: "4rem",
+                                    height: "4rem",
+                                    textAlign: "center",
+                                    alignContent: "center",
+                                    borderRadius: "12px",
+                                    mb: 2,
+                                    ":hover": { cursor: "pointer" }
+                                }}
+                            >
+                                <Typography variant="h4" width="fit-content" color="black" minWidth="100%" fontWeight={600} >T{deckData?.tier ?? "?"}</Typography>
+                            </Box>
+                        }
                     </Grid>
                     {authorData?.authorId === currentUserId ?
                         <Grid item container xs={12} md={3} display="flex" justifyContent={{ xs: 'flex-start', md: "flex-end" }} my={2} columnSpacing={1}>
@@ -60,10 +78,23 @@ export const SingleDeck = () => {
                         </Grid>
                     }
                 </Grid>
-                <Typography variant="h5" width="fit-content" mb={2} onClick={() => navigate("/user/?id=" + authorData?.authorId)}>Deck owner: {authorData?.authorDisplayName ?? "?"}</Typography>
-                {deckData?.tierlist &&
-                    <Typography variant="h5" width="fit-content" onClick={() => navigate("/tierlists/" + deckData?.tierlist?.toLowerCase())}>Tierlist: {deckData?.tierlist ?? '?'} - Tier: {deckData?.tier ?? "?"}</Typography>
-                }
+                <Grid container width="fit-content" onClick={() => navigate("/user/?id=" + authorData?.authorId)} sx={{ ":hover": { cursor: "pointer" } }}>
+                    <img
+                        width={50}
+                        height={50}
+                        src={authorData?.image}
+                        style={{
+                            backgroundImage: 'url("/images/default-profile.jpg")',
+                            backgroundSize: "cover",
+                            objectFit: "cover",
+                            borderRadius: "50%",
+                            marginRight: "1rem"
+                        }}
+                    />
+                    <Typography variant="h5" width="fit-content" mb={2} lineHeight={2}>
+                        De {authorData?.authorDisplayName ?? "?"}
+                    </Typography>
+                </Grid>
             </Grid>
             <Grid container direction="column" justifyContent="center">
                 <Typography variant="h4">Main Deck</Typography>

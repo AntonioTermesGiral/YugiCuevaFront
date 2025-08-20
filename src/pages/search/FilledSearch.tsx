@@ -55,7 +55,7 @@ export const FilledSearch = () => {
             setFoundUsers(users);
             setDeckOwners(owners)
         });
-    }, [loc.pathname])
+    }, [loc.search])
 
     return (
         <Grid container direction="column" p={2}>
@@ -74,9 +74,7 @@ export const FilledSearch = () => {
                 <Typography variant="h3">Users found: </Typography>
                 <Grid container>
                     {foundUsers.map((currentUser) => (
-                        <Grid item m={1} key={currentUser.id} minWidth="250px">
-                            <UserCard user={currentUser} />
-                        </Grid>
+                        <UserCard user={currentUser} key={currentUser.id} />
                     ))}
                 </Grid>
             </Grid>

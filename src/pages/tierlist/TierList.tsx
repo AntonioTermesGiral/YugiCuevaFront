@@ -2,24 +2,11 @@ import { Grid, GridProps, Paper, Typography } from "@mui/material";
 import { Enums } from "../../database.types"
 import { TierListDeck } from "./TierListDeck";
 import { useTierList } from "./useTierList";
+import { colorLoop } from "../../constants/colors";
 
 interface ITierList {
     variant: Enums<"Tierlist">;
 }
-
-const colorLoop = [
-    '#ff7f7f',
-    '#ffbf7f',
-    '#ffdf7f',
-    '#FFFF7F',
-    '#bfff7f',
-    '#7fff7f',
-    '#7fffff',
-    '#7fbfff',
-    '#7f7fff',
-    '#ff7fff',
-    '#bf7fbf'
-]
 
 const getBackgroundColorLoop = (index: number) => {
     let currentIndex = index;
