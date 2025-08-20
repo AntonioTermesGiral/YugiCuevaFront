@@ -7,7 +7,7 @@ export const fetchMatchData = async (supabase: SupabaseClient): Promise<IRawMatc
     let matchesDataObj = DEF_RAW_MATCH;
 
     // LASTEST MATCHES
-    matchesObj = await supabase.from('match').select().limit(10).order('date', { ascending: false });
+    matchesObj = await supabase.from('match').select().order('date', { ascending: false });
     matchesDataObj = await supabase.from('match_data').select();
     return { matchesObj, matchesDataObj }
 }
