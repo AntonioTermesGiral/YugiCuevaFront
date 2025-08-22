@@ -6,6 +6,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+import BlockIcon from '@mui/icons-material/Block';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useToolbar } from "./useToolbar";
 import { CSSProperties } from "react";
@@ -60,6 +61,12 @@ export const YGCMobileToolbar = () => {
                             <ListItemButton onClick={() => handleNavigate("/duels")}>
                                 <ListItemIcon style={{ color: "white" }}><HistoryToggleOffIcon /></ListItemIcon>
                                 <ListItemText primary="Duels" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => handleNavigate("/banlist")}>
+                                <ListItemIcon style={{ color: "white" }}><BlockIcon /></ListItemIcon>
+                                <ListItemText primary="Banlist" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>

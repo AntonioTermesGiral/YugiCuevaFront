@@ -6,7 +6,7 @@ import { IMatch } from "../matches/data-load/match_data_interfaces";
 import { buildMatchData, fetchMatchDataByDeck } from "../matches/data-load/match_data_loaders";
 import { sortCardsInDeck } from "../../utils/sortHelper";
 
-interface ICardSimpleData {
+export interface ICardSimpleData {
     type: string;
     level: number | null;
     linkval: number | null;
@@ -104,7 +104,7 @@ export const useSingleDeckViewModel = () => {
 
             return {
                 deckData: deckData[0],
-                deckContents: sortCardsInDeck(dContent),
+                deckContents: sortCardsInDeck(dContent) as IDeckContent[],
                 authorData: {
                     authorDisplayName: authorDN[0].display_name,
                     authorId: authorDN[0].id,

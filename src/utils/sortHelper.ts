@@ -1,6 +1,7 @@
 import { EFFECT_MONSTERS, FUSION_MONSTERS, LINK_MONSTERS, MONSTER_TYPES, NORMAL_MONSTERS, RITUAL_MONSTERS, SPELL_SUBTYPES, SPELL_TRAP_TYPES, SYNCHRO_MONSTERS, TRAP_SUBTYPES, XYZ_MONSTERS } from "../constants/sortHelperTypes";
 import { Tables } from "../database.types";
-import { IDeckContent } from "../pages/single-deck/useSingleDeckViewModel";
+import { ISimpleBanlistData } from "../pages/banlist/useBanlistViewModel";
+import { ICardSimpleData, IDeckContent } from "../pages/single-deck/useSingleDeckViewModel";
 
 const isMonster = (type: string) => MONSTER_TYPES.includes(type);
 const isST = (type: string) => SPELL_TRAP_TYPES.includes(type);
@@ -28,48 +29,48 @@ const assignMonsterTypeValue = (monsterType: string) => {
     }
 }
 
-const compareMonsters = (a: IDeckContent, b: IDeckContent) => {
+const compareMonsters = (a: ICardSimpleData, b: ICardSimpleData) => {
     // Check monsters by Normal/Effect/Ritual
-    const typeValA = assignMonsterTypeValue(a.cardSimpleData.type);
-    const typeValB = assignMonsterTypeValue(b.cardSimpleData.type);
+    const typeValA = assignMonsterTypeValue(a.type);
+    const typeValB = assignMonsterTypeValue(b.type);
     if (typeValA !== typeValB)
         return typeValA - typeValB;
 
     // Check monsters by Level
-    const levelA = a.cardSimpleData.level ?? 0;
-    const levelB = b.cardSimpleData.level ?? 0;
+    const levelA = a.level ?? 0;
+    const levelB = b.level ?? 0;
     if (levelA !== levelB)
         return levelB - levelA;
 
     // Check monsters by atk
-    const atkA = a.cardSimpleData.atk ?? 0;
-    const atkB = b.cardSimpleData.atk ?? 0;
+    const atkA = a.atk ?? 0;
+    const atkB = b.atk ?? 0;
     if (atkA !== atkB)
         return atkB - atkA;
 
     // Check monsters by def
-    const defA = a.cardSimpleData.def ?? 0;
-    const defB = b.cardSimpleData.def ?? 0;
+    const defA = a.def ?? 0;
+    const defB = b.def ?? 0;
     if (defA !== defB)
         return defB - defA;
 
     return 0;
 }
 
-const compareSpells = (a: IDeckContent, b: IDeckContent) => {
-    const aRace = a.cardSimpleData.race_type as keyof typeof SPELL_SUBTYPES;
-    const bRace = b.cardSimpleData.race_type as keyof typeof SPELL_SUBTYPES;
+const compareSpells = (a: ICardSimpleData, b: ICardSimpleData) => {
+    const aRace = a.race_type as keyof typeof SPELL_SUBTYPES;
+    const bRace = b.race_type as keyof typeof SPELL_SUBTYPES;
     return SPELL_SUBTYPES[aRace] - SPELL_SUBTYPES[bRace];
 }
 
-const compareTraps = (a: IDeckContent, b: IDeckContent) => {
-    const aRace = a.cardSimpleData.race_type as keyof typeof TRAP_SUBTYPES;
-    const bRace = b.cardSimpleData.race_type as keyof typeof TRAP_SUBTYPES;
+const compareTraps = (a: ICardSimpleData, b: ICardSimpleData) => {
+    const aRace = a.race_type as keyof typeof TRAP_SUBTYPES;
+    const bRace = b.race_type as keyof typeof TRAP_SUBTYPES;
     return TRAP_SUBTYPES[aRace] - TRAP_SUBTYPES[bRace];
 }
 
 
-const sortCardsInDeck = (cardList: IDeckContent[]) => {
+const sortCardsInDeck = (cardList: IDeckContent[] | ISimpleBanlistData[]) => {
     return cardList.sort((a, b) => {
         const aType = a.cardSimpleData.type;
         const bType = b.cardSimpleData.type;
@@ -80,16 +81,16 @@ const sortCardsInDeck = (cardList: IDeckContent[]) => {
         else if (isST(aType) && isMonster(bType))
             return 1;
         else if (isMonster(aType) && isMonster(bType))
-            return compareMonsters(a, b);
+            return compareMonsters(a.cardSimpleData, b.cardSimpleData);
         // Spell & Trap comparations
         else if (isSpell(aType) && isTrap(bType))
             return -1;
         else if (isTrap(aType) && isSpell(bType))
             return 1;
         else if (isSpell(aType) && isSpell(bType))
-            return compareSpells(a, b);
+            return compareSpells(a.cardSimpleData, b.cardSimpleData);
         else if (isTrap(aType) && isTrap(bType))
-            return compareTraps(a, b);
+            return compareTraps(a.cardSimpleData, b.cardSimpleData);
         else return 0;
     });
 }

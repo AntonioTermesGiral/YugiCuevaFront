@@ -19,12 +19,11 @@ export const YGCDesktopToolbar = () => {
             <AppBar position="static">
                 <Toolbar sx={styles.toolbar}>
                     <Grid container>
-                        <Grid item display="flex" alignItems="center" xs={8}>
+                        <Grid item display="flex" alignItems="center" gap={1} xs={8}>
                             <img {...styles.profilePicture} src={pfpUrl} onClick={() => handleNavigate(getUserRoute())} />
-                            <Divider {...styles.divider} />
                             <Button sx={styles.navButton} onClick={() => handleNavigate("/tierlists/meta")}>Tierlist</Button>
-                            <Divider {...styles.divider} />
                             <Button sx={styles.navButton} onClick={() => handleNavigate("/duels")}>Duels</Button>
+                            <Button sx={styles.navButton} onClick={() => handleNavigate("/banlist")}>Banlist</Button>
                         </Grid>
                         <Grid item xs={4}>
                             <Paper sx={styles.searchContainer}>

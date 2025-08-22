@@ -78,10 +78,10 @@ export const SingleCard = () => {
                     </Typography>
                 </Grid>
             </Grid>
-            <Grid container direction="column" px={4}>
-                <Typography variant="h5" mb={2}>
+            <Grid container direction="column" px={4} pb={2}>
+                {relatedDecks.length > 0 && <Typography variant="h5" mb={2}>
                     Decks with this card
-                </Typography>
+                </Typography>}
                 <Grid overflow="hidden" ref={emblaRef} maxWidth="100%">
                     <Grid container wrap="nowrap">
                         {relatedDecks.map((d) => (

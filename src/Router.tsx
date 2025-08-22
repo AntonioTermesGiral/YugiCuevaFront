@@ -10,6 +10,7 @@ import { Matches } from "./pages/matches/Matches";
 import { YGCToolbar } from "./components/layout/Toolbar";
 import { WipScreen } from "./components/WipScreen";
 import { Manage } from "./pages/manage/Manage";
+import { Banlist } from "./pages/banlist/Banlist";
 
 const routes: RouteObject[] = [
     {
@@ -53,6 +54,10 @@ const routes: RouteObject[] = [
     {
         path: "/card/*",
         element: <SingleCard />,
+    },
+    {
+        path: "/banlist",
+        element: <Banlist />,
     }
 ];
 
