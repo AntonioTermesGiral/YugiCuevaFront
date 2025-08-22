@@ -58,7 +58,7 @@ export const CreateMatchDialog = ({ refreshData }: { refreshData: () => void }) 
             <Dialog fullScreen={!matchesSM} open={open} onClose={() => setOpen(false)} PaperProps={{ sx: { padding: 4 } }} fullWidth maxWidth="lg">
                 <Box py={1}>
                     <Grid container my={1} justifyContent="space-between">
-                        <Typography variant="h4">Crear Partida</Typography>
+                        <Typography variant="h4">Registrar Duelo</Typography>
                         <div onClick={() => setOpen(false)}>
                             <CloseIcon />
                         </div>
@@ -111,8 +111,8 @@ export const CreateMatchDialog = ({ refreshData }: { refreshData: () => void }) 
                         </Grid>
                     </Grid>
                     <Grid container justifyContent="space-between" mt={10}>
-                        <Button color="inherit" onClick={() => setOpen(false)}>Cancelar</Button>
-                        <Button color="success" onClick={handleSubmit}>Crear</Button>
+                        <Button color="error" variant="outlined" onClick={() => setOpen(false)}>Cancelar</Button>
+                        <Button color="success" variant="outlined" onClick={handleSubmit}>Registrar</Button>
                     </Grid>
                 </Box>
             </Dialog>

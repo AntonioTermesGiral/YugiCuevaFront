@@ -29,14 +29,14 @@ export const TierListDeck = ({ deck, owners }: ITierListDeck) => {
     const StyledBox = styled(Box)(() => ({
         transition: "transform 0.15s ease-in-out",
         "&:hover": { transform: "scale3d(1.05, 1.05, 1)" },
-        width: "9em",
-        height: "9em"
+        width: "clamp(7rem, 20vw, 9rem)",
+        height: "clamp(7rem, 20vw, 9rem)"
     }))
 
     return (
         <StyledBox key={deck.id} position="relative" onClick={() => navigate("/deck/?id=" + deck.id)}>
             <img
-                style={{ objectFit: "cover" }}
+                style={{ objectFit: "cover", borderRadius: "12px" }}
                 height="100%" width="100%"
                 src={deckImage}
                 alt={deck.name}

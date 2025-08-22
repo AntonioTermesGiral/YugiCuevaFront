@@ -1,4 +1,5 @@
 import { EFFECT_MONSTERS, FUSION_MONSTERS, LINK_MONSTERS, MONSTER_TYPES, NORMAL_MONSTERS, RITUAL_MONSTERS, SPELL_SUBTYPES, SPELL_TRAP_TYPES, SYNCHRO_MONSTERS, TRAP_SUBTYPES, XYZ_MONSTERS } from "../constants/sortHelperTypes";
+import { Tables } from "../database.types";
 import { IDeckContent } from "../pages/single-deck/useSingleDeckViewModel";
 
 const isMonster = (type: string) => MONSTER_TYPES.includes(type);
@@ -93,6 +94,13 @@ const sortCardsInDeck = (cardList: IDeckContent[]) => {
     });
 }
 
+const deckTierComparator = (a: Tables<"deck">, b: Tables<"deck">) => {
+    const aTier = a.tier !== null ? a.tier : Infinity;
+    const bTier = b.tier !== null ? b.tier : Infinity;
+    return aTier - bTier;
+}
+
 export {
-    sortCardsInDeck
+    sortCardsInDeck,
+    deckTierComparator
 }

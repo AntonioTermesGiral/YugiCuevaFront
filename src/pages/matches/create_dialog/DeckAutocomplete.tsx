@@ -3,6 +3,7 @@ import { useClient } from "../../../client/useClient";
 import { Fragment, useState } from "react";
 import { Tables } from "../../../database.types";
 import { GenericAutocompleteItemType } from "../../../constants/types";
+import { deckTierComparator } from "../../../utils/sortHelper";
 
 interface IDeckAutocomplete {
     currentDeck: Tables<"deck"> | null,
@@ -21,9 +22,11 @@ export const DeckAutocomplete = ({ currentDeck, setCurrentDeck }: IDeckAutocompl
             // Get decks
             const { data: decks, error: deckError } = await supabase.from('deck').select();
             deckError && console.log(decks, deckError);
+
+            const sortedDecks = (decks as Tables<"deck">[]).sort(deckTierComparator);
             setLoading(false);
 
-            setDecks([...decks]);
+            setDecks([...sortedDecks]);
         })();
     };
 
@@ -59,6 +62,7 @@ export const DeckAutocomplete = ({ currentDeck, setCurrentDeck }: IDeckAutocompl
                     }}
                 />
             )}
+            groupBy={(option) => option.tier !== null ? `Tier ${option.tier}` : "No Tier"}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props as GenericAutocompleteItemType;
                 const imgUrl = import.meta.env.VITE_SUPABASE_DECK_IMG_BUCKET_URL + option.image

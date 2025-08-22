@@ -1,4 +1,4 @@
-import { Grid, GridProps, Paper, Typography } from "@mui/material";
+import { Box, Grid, GridProps, Typography } from "@mui/material";
 import { Enums } from "../../database.types"
 import { TierListDeck } from "./TierListDeck";
 import { useTierList } from "./useTierList";
@@ -8,7 +8,7 @@ interface ITierList {
     variant: Enums<"Tierlist">;
 }
 
-const getBackgroundColorLoop = (index: number) => {
+const getTierColor = (index: number) => {
     let currentIndex = index;
     while (currentIndex > colorLoop.length - 1) {
         currentIndex -= colorLoop.length;
@@ -22,39 +22,48 @@ export const TierList = ({ variant }: ITierList) => {
     const { sortedDecks, allOwners } = useTierList(variant);
 
     return (
-        <Grid container direction="column" alignItems="center" pb={3}>
-            <Typography variant="h4" my={2}>TIERLIST: {variant}</Typography>
-            <Paper sx={{ width: "98vw", backgroundColor: "transparent" }}>
+        <Grid container direction="column" alignItems="center" py={1}>
+            {/* FIXME: MAYBE ADD ON MULTIPLE TIERLISTS */}
+            {/* <Typography variant="h4" my={2}>TIERLIST: {variant}</Typography> */}
+            <Box sx={{ width: "100%", color: "black" }}>
                 {[...sortedDecks].map((tierData, index) => {
                     const currentTier = tierData[0];
                     const currentTierDecks = tierData[1];
                     return (
-                        <Grid container key={currentTier} border="6px solid black" borderBottom={index === sortedDecks.size - 1 ? "6px solid black" : "none"} minHeight="10rem">
-                            <Grid {...styles.tier} sx={{ backgroundColor: getBackgroundColorLoop(index) }}>
-                                {isNaN(currentTier) ? <Typography variant="h5">No Tier</Typography> : <Typography variant="h4" fontSize="4rem">{currentTier}</Typography>}
+                        <Grid
+                            container
+                            key={currentTier}
+                            direction={{ xs: "column", sm: "row" }}
+                            wrap="nowrap"
+                            minHeight="10rem"
+                        >
+                            <Grid {...styles.tier} sx={{ backgroundColor: getTierColor(index) }}>
+                                {isNaN(currentTier) ?
+                                    <Typography fontWeight={500} fontSize="clamp(2rem, 8vw, 3rem)">No Tier</Typography>
+                                    : <Typography fontWeight={500} fontSize="clamp(3rem, 16vw, 4rem)">{currentTier}</Typography>
+                                }
                             </Grid>
-                            <Grid item container alignItems="center" xs={10} gap={1} p={1}>
+                            <Grid item container alignItems="center" gap={1} p={1}>
                                 {currentTierDecks.map((currentDeck) => <TierListDeck deck={currentDeck} owners={allOwners} key={currentDeck.id} />)}
                                 {currentTierDecks.length == 0 && <Typography variant="h5" color="white" ml={1}>No Decks...</Typography>}
                             </Grid>
                         </Grid>
                     )
                 })}
-            </Paper>
+            </Box>
         </Grid>
     )
 }
 
 const getStyles = () => {
     const tier: GridProps = {
-        item: true,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        xs: 2,
-        borderRight: "6px solid black",
+        borderRadius: "12px",
         textAlign: "center",
-        py: 2,
+        px: 2,
+        m: 1
     }
 
     return {
