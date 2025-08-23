@@ -29,7 +29,7 @@ export const useToolbar = () => {
 
     useEffect(() => {
         const userPFP = localStorage.getItem('current-user-pfp');
-        userPFP && setPfpUrl(userPFP);
+        userPFP && setPfpUrl(userPFP + "?ver=" + new Date().getTime());
     }, [])
 
     return {

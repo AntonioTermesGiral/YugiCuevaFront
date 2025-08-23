@@ -1,9 +1,11 @@
 import { useEffect } from "react"
 import { LS_USER_DATA_KEY } from "../constants/keys";
 import { useClient } from "../client/useClient";
+import { useLocation } from "react-router-dom";
 
 export const useLoadPFP = () => {
     const { getInstance } = useClient();
+    const { pathname } = useLocation();
 
     const handleLoadPfp = async (userId: string) => {
         const supabase = getInstance();
@@ -27,5 +29,5 @@ export const useLoadPFP = () => {
 
             } else localStorage.removeItem("current-user-pfp");
         }
-    }, []);
+    }, [pathname]);
 }

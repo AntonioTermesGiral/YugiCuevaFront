@@ -19,7 +19,7 @@ export const TierListDeck = ({ deck, owners }: ITierListDeck) => {
 
         const deckOwner = owners.find((ow) => ow.id === deck.owner)
         if (deckOwner && deckOwner.image !== null)
-            setOwnerImage(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + deckOwner.image);
+            setOwnerImage(import.meta.env.VITE_SUPABASE_PFP_IMG_BUCKET_URL + deckOwner.image + "?ver=" + new Date().getTime());
     }
 
     useEffect(() => {
