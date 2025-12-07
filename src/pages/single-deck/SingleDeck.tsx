@@ -23,7 +23,10 @@ export const SingleDeck = () => {
     const DeckCard = ({ card, i }: { card: IDeckContent, i: number }) =>
         <Grid {...cardProperties} key={card.cardId + "card" + i}
             onClick={() => navigate("/card/?id=" + card.cardId)}>
-            <img height={150} width={100} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
+            <div style={{ position: "relative", height: 150, width: 100 }} >
+                <img height={150} width={100} src={card.cardImage} style={{ backgroundImage: 'url("/images/cardback.jpg")', backgroundSize: "contain" }} />
+                {card.restriction && <img height={50} width={50} src={`/images/${card.restriction}.png`} style={{ position: "absolute", bottom: "10px", right: '25px' }} />}
+            </div>
         </Grid>;
 
     const renderDeckCards = (position: Enums<'CardPosition'>) => {

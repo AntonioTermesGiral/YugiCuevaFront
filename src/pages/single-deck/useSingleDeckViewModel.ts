@@ -25,6 +25,7 @@ export interface IDeckContent {
     qty: number;
     cardImage: string;
     position?: Enums<'CardPosition'>;
+    restriction?: Enums<'Restriction'>;
 }
 
 interface IDeckAuthorData {
@@ -92,13 +93,18 @@ export const useSingleDeckViewModel = () => {
             matchesDataObj.error && console.log(matchesDataObj.error);
             const matchesData = await buildMatchData(supabase, { matchesObj, matchesDataObj });
 
+            const { data: banlistData, error: banlistError } = await supabase.from('banlist').select('id, restriction').eq("format", "TCG");
+            banlistError && console.log("Error while loading banlist", banlistError);
+
             const dContent = linksData.map((link: ICardSimpleDBData) => {
+                const onBanlist = (banlistData as {id: number, restriction: Enums<'Restriction'>}[]).find((cardOnBanlist) => cardOnBanlist.id === link.card_id);
                 return {
                     cardId: link.card_id,
                     cardImage: import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_URL + link.card_id + import.meta.env.VITE_SUPABASE_CARD_IMG_BUCKET_EXT + "?ver=" + new Date().getTime(),
                     qty: link.quantity,
                     position: link.position,
-                    cardSimpleData: link.card
+                    cardSimpleData: link.card,
+                    restriction: onBanlist?.restriction
                 } as IDeckContent;
             });
 

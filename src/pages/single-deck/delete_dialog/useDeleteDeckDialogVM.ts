@@ -13,14 +13,18 @@ export const useDeleteDeckDialogVM = ({ deckId, deckImageId }: IDeleteDeckDialog
         if (deckId) {
             const supabase = getInstance();
 
-            const { removedLinks, removedLinksError } = await supabase.from('card_in_deck').delete().eq('deck_id', deckId);
-            console.log("Links Removal: ", removedLinks, removedLinksError);
+            const { data: matches, error: matchesError } = await supabase.from('match_data').select('match_id').eq("deck", deckId);
+            matchesError && console.log("Error while loading matches to delete", matchesError);
+            const matchesIds = (matches as {match_id: string}[]).map((m) => m.match_id)
+
+            const { removedMatches, removedMatchesError } = await supabase.from('match').delete().in('id', matchesIds);
+            console.log("Deck Removal: ", removedMatches, removedMatchesError);
 
             const { removedDeck, removedDeckError } = await supabase.from('deck').delete().eq('id', deckId);
             console.log("Deck Removal: ", removedDeck, removedDeckError);
 
-            const removed = await handleRemoveDeckImage();
-            console.log("Deck Image Removal: ", removed);
+            const removedImage = await handleRemoveDeckImage();
+            console.log("Deck Image Removal: ", removedImage);
         } else console.log("COULD NOT DELETE DECK, undefined id")
     }
 
