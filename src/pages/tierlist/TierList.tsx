@@ -1,8 +1,9 @@
-import { Box, Grid, GridProps, Typography } from "@mui/material";
+import { Box, Grid, GridProps, MenuItem, Select, Typography } from "@mui/material";
 import { Enums } from "../../database.types"
 import { TierListDeck } from "./TierListDeck";
 import { useTierList } from "./useTierList";
-import { colorLoop } from "../../constants/colors";
+import { colorLoop, POINTS_BLUE } from "../../constants/colors";
+import { styled } from '@mui/material/styles';
 
 interface ITierList {
     variant: Enums<"Tierlist">;
@@ -17,18 +18,42 @@ const getTierColor = (index: number) => {
     return colorLoop[currentIndex];
 }
 
+const StyledSelect = styled(Select)({
+    color: POINTS_BLUE,
+    ":hover": {
+        ".MuiOutlinedInput-notchedOutline": {
+            borderColor: POINTS_BLUE
+        }
+    },
+    "fieldset": {
+        borderColor: POINTS_BLUE
+    },
+    "svg": {
+        color: POINTS_BLUE
+    }
+})
+
 export const TierList = ({ variant }: ITierList) => {
     const styles = getStyles();
-    const { sortedDecks, allOwners } = useTierList(variant);
+    const { sortedDecks, allOwners, selectedOwner, setSelectedOwner, EMPTY_SELECTED_OWNER } = useTierList(variant);
 
     return (
         <Grid container direction="column" alignItems="center" py={1}>
+            <Grid container flexDirection="column" alignContent="flex-start" p={1}>
+                <Typography mb={0.5}>Filter By User:</Typography>
+                <StyledSelect value={selectedOwner} onChange={(v) => setSelectedOwner(v.target.value as string)} variant="outlined">
+                    <MenuItem value={EMPTY_SELECTED_OWNER}>No Owner Selected</MenuItem>
+                    {allOwners.map(owner =>
+                        <MenuItem key={owner.id} value={owner.id}>{owner.display_name}</MenuItem>
+                    )}
+                </StyledSelect>
+            </Grid>
             {/* FIXME: MAYBE ADD ON MULTIPLE TIERLISTS */}
             {/* <Typography variant="h4" my={2}>TIERLIST: {variant}</Typography> */}
             <Box sx={{ width: "100%", color: "black" }}>
                 {[...sortedDecks].map((tierData, index) => {
                     const currentTier = tierData[0];
-                    const currentTierDecks = tierData[1];
+                    const currentTierDecks = tierData[1].filter((td) => selectedOwner === EMPTY_SELECTED_OWNER || td.owner === selectedOwner);
                     return (
                         <Grid
                             container

@@ -3,12 +3,16 @@ import { useClient } from "../../client/useClient";
 import { useEffect, useState } from "react";
 import { Enums, Tables } from "../../database.types";
 import { maxTier } from "../../constants/tiers";
+import { v4 } from "uuid";
+
+const EMPTY_SELECTED_OWNER = "EMPTY_SELECTED_USER" + v4();
 
 export const useTierList = (variant: Enums<"Tierlist">) => {
     const { getInstance } = useClient();
     const loc = useLocation();
     const [sortedDecks, setSortedDecks] = useState<Map<number, Tables<"deck">[]>>(new Map());
     const [allOwners, setAllOwners] = useState<Tables<"profile">[]>([]);
+    const [selectedOwner, setSelectedOwner] = useState<string>(EMPTY_SELECTED_OWNER);
 
     const getTierListData = async () => {
         const supabase = getInstance();
@@ -70,6 +74,9 @@ export const useTierList = (variant: Enums<"Tierlist">) => {
 
     return {
         sortedDecks,
-        allOwners
+        allOwners,
+        selectedOwner,
+        setSelectedOwner,
+        EMPTY_SELECTED_OWNER
     }
 }
